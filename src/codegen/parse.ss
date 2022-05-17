@@ -1,6 +1,4 @@
 (load "utility.ss");; for various utility functions
-(define prolog-start "<?")
-(define prolog-end "?>") 
 (define comment-start "<!--")
 (define comment-end "-->")
 
@@ -52,93 +50,116 @@
                             (make-message-condition
                                 "Ill-formed XML file!"))))))))
 
-(define (xml->list-aux s in-tag? tagnestn in-prolog? lst inner curtag attribute value strlit?)
-    (printf "s = ~s\nlst= ~s\ninner = ~s\ncurtag = ~s\n" s lst inner curtag)
+(define (match lookahead predicate-or-char)
     (cond
-        [(equal? s "") lst]
-        [(and
-            (not (equal? curtag ""))
-            (equal?
-                (substring s 0 (+ (string-length curtag) 1))
-                (string-append "</" (scdr curtag))))
-                    (display "zero\n")
-                    (xml->list-aux
-                        (substring s 0 (+ 2 (string-length (scdr curtag))))
-                        (if (zero? tagnestn)
-                            (tag-not-opened-error)
-                            #t)
-                        (if (zero? tagnestn)
-                            (tag-not-opened-error)
-                            (sub1 tagnestn))
-                        #f
-                        (add
-                            (add
-                                (string-append "</" (scdr curtag))
-                                inner)
-                            lst)
-                        '() "" "" "" #f)]
-        [(equal? (scar s) #\<)
-            (display "one\n")
-            (let [(tag (try-collect-tag s))]
+        [(procedure? predicate-or-char)
+            (equal? (predicate-or-char lookahead) #t) #t]
+        [(char? predicate-or-char)
+            (equal? lookahead predicate-or-char) #t]
+        [else
+            (raise
+                (condition
+                    (make-error)
+                    (make-message-condition
+                        "Error while parsing the XML string!\n")))]))
+
+;;stack operations on lists, used for the tag stack in the main function of this file.
+(define (push e l)
+    (add e l))
+(define (pop l)
+    (reverse (cdr (reverse l))))
+
+;;avp is an attribute-value pair
+(define (xml->list-aux s lst inner current-tag open-tags attribute value avp strlit? tag-closing?)
+    (printf "s = ~s\ncurrent tag = ~s\nattribute = ~s\nvalue = ~s\nopen-tags = ~s\navp = ~s\nstrlit? = ~s\n"
+        s current-tag attribute value open-tags avp strlit?)
+    (let [(lookahead (scar s))]
+        (cond
+            [(equal? s "")
+                (if (null? open-tags)
+                    lst
+                    (raise
+                        (condition
+                            (make-error)
+                            (make-message-condition
+                                "Error! unclosed tags, Invalid XML."))))]
+            ;;;"normal tag" closing section
+            [(and (>= (string-length s) 2) (equal? (substring s 0 2) "</"))
                 (xml->list-aux
-                    (substring
-                        s
-                        (string-length tag)
-                        (string-length s)) 
-                    #t (add1 tagnestn) #f lst
-                    (add tag inner)
-                    tag "" "" strlit?))]
-        [(equal? (substring s 0 2) "/>")
-            (display "two\n")
-            (if (not (zero? tagnestn))
+                    (substring s 2 (string-length s)) lst (add (string-append "</" (scdr current-tag)) inner)
+                    (car open-tags) (pop open-tags) "" "" '() #f #t)]
+            ;;;"normal tag" opening/closing ('>' can be used for closing a tag too) section
+            [(equal? lookahead #\<)
+                (xml->list-aux (scdr s) lst inner "<" (push current-tag open-tags) "" "" '() #f #f)]
+            [(equal? lookahead #\>)
+                (xml->list-aux
+                    (scdr s) lst inner (if tag-closing? "" (string-append current-tag ">"))
+                    (if tag-closing? (pop open-tags) (push (string-append current-tag ">") open-tags))
+                    "" "" '() #f #f)]
+            [(member? lookahead '(#\tab #\space))
+                (if strlit?
+                    (begin
+                        (set! value (string-append value (string lookahead)))
+                        (xml->list-aux (scdr s) lst inner current-tag open-tags attribute value avp strlit? #f))
+                    (if (equal? value "")
+                        (xml->list-aux
+                            (scdr s)
+                            lst
+                            inner
+                            current-tag
+                            open-tags
+                            attribute
+                            ""
+                            '()
+                            #f
+                            #f)
+                        (xml->list-aux (scdr s) lst (add avp inner) current-tag open-tags attribute "" '() strlit?)))]
+            [(equal? lookahead #\")
+                (set! value (string-append value (string lookahead))) 
+                (xml->list-aux
+                    (scdr s) lst inner current-tag open-tags attribute
+                    (if strlit? "" value) (if strlit? (add value avp) avp) (not strlit?) tag-closing?)]
+            [strlit?
+                (set! value (string-append value (string lookahead)))
+                (xml->list-aux (scdr s) lst inner current-tag open-tags attribute value avp strlit? #f)]
+            [(and (>= (string-length s) 2) (equal? (substring s 0 2) "<?"))
                 (xml->list-aux
                     (substring s 2 (string-length s))
-                    (if (zero? (- tagnestn 1))
-                        #f
-                        #t)
-                    (sub1 tagnestn)
-                    #f (if (not (null? inner))(add inner lst) lst) '() "" "" "" strlit?)
-                (tag-not-opened-error))]
-        [(equal? (scar s) #\>)
-            (display "three\n")
-            (if (not (zero? tagnestn))
-                (xml->list-aux
-                    (substring s 1 (string-length s))
-                    (if (zero? tagnestn) #f #t) (sub1 tagnestn)
-                    #f (if (not (null? inner))(add inner lst) lst) 
-                    (add (string-append curtag (string (scar s))) inner) "" "" "" strlit?)
-                (tag-not-opened-error))]
-        [(char-whitespace? (scar s))
-            (display "four\n")
-            (xml->list-aux
-                (scdr s) (if (zero? tagnestn) #f #t) tagnestn
-                #f lst (if (not (equal? value "")) (add value inner) inner)
-                curtag attribute value strlit?)]
-        [(equal? (scar s) #\")
-            (display "five\n")
-            (xml->list-aux
-                (scdr s) (if (zero? tagnestn) #f #t) tagnestn in-prolog? lst inner
-                curtag attribute (string-append value (string #\")) (not strlit?))]
-        [strlit?
-            (display "six\n")
-            (xml->list-aux
-                (scdr s) (if (zero? tagnestn) #f #t) tagnestn in-prolog? lst inner
-                curtag attribute (string-append value (string (scar s))) strlit?)]
-        [(or
-            (char-alphabetic? (scar s))
-            (and
-                (or
-                    (not (equal? curtag ""))
-                    (not (equal? attribute "")))
-                (char-numeric? (scar s))))
-                    (display "seven\n")
+                    lst (add '? inner) "?" (push "?" open-tags)
+                    "" "" '() #f #f)]
+            [(and (>= (string-length s) 2) (equal? (substring s 0 2) "?>"))
+                (if (and (pair? open-tags) (equal? (car open-tags) "?"))
                     (xml->list-aux
-                        (scdr s) (if (zero? tagnestn) #f #t) tagnestn in-prolog?
-                        lst inner 
-                        (if in-tag? (string-append curtag (string (scar s))) curtag)
-                        (if 
-                            (and 
-                                (not in-tag?)
-                                (not strlit?))
-                                    (string-append attribute (string (scar s))) attribute)
-                        (if strlit? (string-append value (string (scar s))) value) strlit?)]))
+                        (substring s 2 (string-length s))
+                        (add (add "?" inner) lst) '() ""
+                        (pop open-tags) "" "" '() #f #f)
+                    (raise
+                        (condition
+                            (make-error)
+                            (make-message-condition
+                                "closed a prolog without an opening '<?'!"))))]
+            [(equal? lookahead #\=)
+                (if (equal? attribute "")
+                    (raise
+                        (condition
+                            (make-error)
+                            (make-message-condition
+                                "Invalid tag: '=' without a previous attribute!")))
+                    (xml->list-aux
+                        (scdr s) lst inner current-tag open-tags "" "" (add attribute avp) #f #f))]
+            ;;;character collecting section
+            [(or
+                (char-alphabetic? lookahead)
+                (and
+                    (or (not (equal? current-tag "")) (not (equal? attribute "")))
+                    (char-numeric? lookahead)))
+                        (if (not tag-closing?)
+                            (xml->list-aux
+                                (scdr s) lst inner "" open-tags 
+                                (string-append attribute (string lookahead))
+                                "" '() #f tag-closing?)
+                            (xml->list-aux
+                                (scdr s) lst inner (string-append current-tag (string lookahead))
+                                open-tags "" "" '() #f tag-closing?))])))
+(define (xml->list s)
+    (xml->list-aux s '() '() "" '() "" "" '() #f #f))

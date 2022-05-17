@@ -33,7 +33,7 @@
     (cond
         [(equal? s "") #f]
         [(< (string-length s) (string-length suffix)) #f]
-        [(equal? (substring s 0 (string-length s)) suffix) news]
+        [(equal? (substring s 0 (string-length s)) suffix) (string-append news suffix)]
         [else
             (string-collect-until-aux
                 (scdr s)
@@ -50,3 +50,5 @@
 		[(not (pair? (cdr p))) (cons (car p) (cons (cdr p) e))]
 		[else (cons (car p) (add e (cdr p)))]))
 
+(define (member? e p)
+    (pair? (member e p)))
