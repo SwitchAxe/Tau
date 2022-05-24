@@ -1,6 +1,6 @@
 ;;car but on strings
 (define (scar s)
-    (car (string->list s)))
+    (and (not (equal? s "")) (car (string->list s))))
 ;;cdr but on strings, this one is basically an alias for substring 
 (define (scdr s)
     (substring s 1 (string-length s)))
@@ -32,7 +32,6 @@
 (define (string-collect-until-aux s suffix news)
     (cond
         [(equal? s "") #f]
-        [(< (string-length s) (string-length suffix)) #f]
         [(equal? (substring s 0 (string-length s)) suffix) (string-append news suffix)]
         [else
             (string-collect-until-aux
@@ -45,10 +44,13 @@
 
 (define (add e p)
 	(cond
-		[(null? p) (list e)]
+		[(null? p) `(,e)]
 		[(null? (cdr p)) (cons (car p) (cons e '()))]
 		[(not (pair? (cdr p))) (cons (car p) (cons (cdr p) e))]
 		[else (cons (car p) (add e (cdr p)))]))
 
 (define (member? e p)
     (pair? (member e p)))
+
+(define (list->number l)
+    (string->number (list->string l)))
