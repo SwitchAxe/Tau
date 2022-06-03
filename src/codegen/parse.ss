@@ -20,15 +20,7 @@
 
 (define (remove-comments s)
     (remove-comments-aux s #f))
-;;returns a string that goes from the start of the string to
-;;the specified char, excluding it.
 
-;;an xml parser needed to generate the code we use
-;;for the window manager.
-;;s is the string obtained from 'file->string' (see "readfile.ss")
-;;of the entire xml file, 'in-tag?' is #t if tagnestn > 0, #f otherwise.
-;;inner is the inner *list* of the result, not the innermost *tag* of the xml.
-;;lst is the result.
 (define (tag-not-opened-error)
     (raise
         (condition
@@ -55,6 +47,8 @@
     (add e l))
 (define (pop l)
     (reverse (cdr (reverse l))))
+(define (get-top l)
+    (car (reverse l)))
 
 (define (xml-string-literal? s)
     (and 
@@ -66,6 +60,7 @@
 (define (xml-parse-tag-aux tagstring avp)
     (cond
         [(equal? tagstring "") '()]
+        [(equal? (scar tagstring) #\>) '()]
         [(equal? (scdr tagstring) ">") '()]
         [(equal? (substring tagstring 0 2) "/>") '()]
         [(equal? (scar tagstring) #\<)
@@ -94,7 +89,7 @@
                     (cons
                         (add (string-append "\"" strlit "\"") avp)
                         (xml-parse-tag-aux
-                            (substring tagstring (string-length strlit) (string-length tagstring))
+                            (substring tagstring (+ 1 (string-length strlit)) (string-length tagstring))
                             '()))))]
         [else
             (let [(attr (collect-until tagstring #\=))]
@@ -118,77 +113,70 @@
         (equal? (substring s 0 2) "</")
         (substring s 2 (sub1 (string-length s)))))
 
-(define (xml->list-aux s tagstack result)
-    (let [(nextchar (scar s))]
+;;returns #t if both lookahead and expected are chars, and also lookahead == expected.
+(define (match? lookahead expected)
+    (and
+        (and (char? lookahead) (char? expected))
+        (equal? lookahead expected)))
+
+(define (xml->list-aux xmlstring tagstack tag-openers result)
+    (let [(nextchar (scar xmlstring))]
         (cond
-            [(equal? nextchar #f) ;;end of the string
+            [(equal? nextchar #f)
                 (if (null? tagstack)
-                    '()
+                    result
                     (raise
                         (condition
                             (make-error)
                             (make-message-condition
-                                "Invalid XML! probably a tag was not closed.\n"))))]
-            [(equal? (substring s 0 2) "</")
-                (let* 
-                    [(tag-closer (try-collect-tag s))
-                    (closing-tag (substring tag-closer 2 (sub1 (string-length tag-closer))))]
-                        (if (equal? closing-tag (symbol->string (car (reverse tagstack))))
-                            (begin
-                                (set! tagstack (pop tagstack))
-                                (cons
-                                    result
-                                        (xml->list-aux
-                                            (substring
-                                                s
-                                                (string-length tag-closer)
-                                                (string-length s))
-                                            tagstack '())))
-                            (raise
-                                (condition
-                                    (make-error)
-                                    (make-message-condition "Invalid XML!\n")))))]
+                                "Unclosed tags! Invalid XML.\n"))))]
+            [(and
+                (> (string-length xmlstring) 2)
+                (equal? (substring xmlstring 0 2) "</"))
+                    (let* 
+                        [(tag-closer (try-collect-tag xmlstring))
+                        (closing-tag (substring tag-closer 2 (sub1 (string-length tag-closer))))]
+                            (if (equal? (get-top tagstack) closing-tag)
+                                (begin
+                                    (set! tagstack (pop tagstack))
+                                    (set!
+                                        xmlstring
+                                        (substring
+                                            xmlstring
+                                            (string-length tag-closer)
+                                            (string-length xmlstring)))
+                                    (xml->list-aux xmlstring tagstack tag-openers result))
+                                (raise
+                                    (condition
+                                        (make-error)
+                                        (make-message-condition
+                                            "Invalid XML: tags don't match!\n")))))]
             [(equal? nextchar #\<)
                 (let*
-                    [(tagstring (collect-until s #\>))
-                    (tag-opener (xml-parse-tag (string-append tagstring ">")))]
-                    (set! tagstack (push (car tag-opener) tagstack))
-                    (xml->list-aux
-                        (substring
-                            s
-                            (+ 1 (string-length tagstring))
-                            (string-length s))
-                        tagstack
-                        (add 
-                            tag-opener
-                            (if (= 1 (length tagstack))
-                                result
-                                (car result)))))]
-            [(equal? nextchar #\")
-                (let [(strlit (string-append (string #\") (collect-until (scdr s) #\")))]
-                    (if strlit
-                        (begin
-                            (set! result (add (string-append strlit "\"") result))
-                            (xml->list-aux
-                                (substring
-                                    s
-                                    (+ 1 (string-length strlit))
-                                    (string-length s))
-                                tagstack
-                                result))))]
-            [(char-numeric? nextchar)
-                ;;loop and accumulate until a non-numeric char is found
-                (let loop [(lst '())]
-                    (set! s (scdr s))
-                    (unless (char-numeric? (scar s)) ;;we found a non-numeric character
-                        (set! result (add (list->number lst) result))
-                        (cons
-                            result
-                            (xml->list-aux
-                                s
-                                tagstack
-                                result)))
-                    (when (char-numeric? (scar s))
-                        (loop (add (scar s) lst))))]
+                    [(tag-opener (xml-parse-tag xmlstring))
+                    (opening-tag (symbol->string (car tag-opener)))]
+                        (set! tagstack (push opening-tag tagstack))
+                        (set!
+                            xmlstring
+                            (substring
+                                xmlstring
+                                (+ 1 (string-length (collect-until xmlstring #\>)))
+                                (string-length xmlstring)))
+                        (set! result (add tag-opener result))
+                        (set! tag-openers (push tag-opener tag-openers))
+                        (xml->list-aux xmlstring tagstack tag-openers result))]
             [(char-whitespace? nextchar)
-                (xml->list-aux (scdr s) tagstack result)])))
+                (xml->list-aux (scdr xmlstring) tagstack tag-openers result)]
+            [(equal? nextchar #\")
+                (set! xmlstring (scdr xmlstring))
+                (let [(strlit (collect-until xmlstring #\"))]
+                    (and
+                        strlit
+                        (begin
+                            (set! result (add (string-append "\"" strlit "\"") result))
+                            (set! xmlstring
+                                (substring
+                                    xmlstring
+                                    (+ 1 (string-length strlit))
+                                    (string-length xmlstring)))
+                            (xml->list-aux xmlstring tagstack tag-openers result))))])))
