@@ -122,9 +122,6 @@
         (substring s 2 (sub1 (string-length s)))))
 
 (define (xml->list-aux xmlstring tagstack tag-openers result)
-    (printf
-        "xmlstring = ~s\ntagstack = ~s\nresult = ~s\n"
-        xmlstring tagstack result)
     (let [(nextchar (scar xmlstring))]
         (cond
             [(equal? nextchar #f)
@@ -149,7 +146,6 @@
                     (let* 
                         [(tag-closer (try-collect-tag xmlstring))
                         (closing-tag (substring tag-closer 2 (sub1 (string-length tag-closer))))]
-                            (printf "\n\nclosing tag = ~s\n\n" closing-tag)
                             (if (equal? (get-top tagstack) closing-tag)
                                 (begin
                                     (set! tagstack (pop tagstack))
@@ -170,7 +166,6 @@
                     [(rawtag (string-append (collect-until xmlstring #\>) ">"))
                     (tag-opener (xml-parse-tag rawtag))
                     (opening-tag (symbol->string (car tag-opener)))]
-                        (printf "tag-opener = ~s\n" tag-opener)
                         (unless (equal? (string-ref rawtag (- (string-length rawtag) 2)) #\/)
                             (set! tagstack (push opening-tag tagstack)))
                         (set!
