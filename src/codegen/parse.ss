@@ -219,3 +219,7 @@
                                         (string-length constant)
                                         (string-length xmlstring)))
                                 (xml->list-aux xmlstring tagstack tag-openers result))))])))
+
+;;wrapper to the xml->list-aux function, which also memoizes it.
+(define xml->list
+    (memoize (lambda (xml) (xml->list-aux xml '() '() '()))))
