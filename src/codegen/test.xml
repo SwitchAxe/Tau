@@ -1,0 +1,21 @@
+<struct name="SCREEN">
+    <field type="WINDOW" name="root" />
+    <field type="COLORMAP" name="default_colormap" />
+    <field type="CARD32" name="white_pixel" />
+    <field type="CARD32" name="black_pixel" />
+    <field type="CARD32" name="current_input_masks" mask="EventMask" />
+    <field type="CARD16" name="width_in_pixels" />
+    <field type="CARD16" name="height_in_pixels" />
+    <field type="CARD16" name="width_in_millimeters" />
+    <field type="CARD16" name="height_in_millimeters" />
+    <field type="CARD16" name="min_installed_maps" />
+    <field type="CARD16" name="max_installed_maps" />
+    <field type="VISUALID" name="root_visual" />
+    <field type="BYTE" name="backing_stores" enum="BackingStore" />
+    <field type="BOOL" name="save_unders" />
+    <field type="CARD8" name="root_depth" />
+    <field type="CARD8" name="allowed_depths_len" />
+    <list type="DEPTH" name="allowed_depths">
+        <fieldref>allowed_depths_len</fieldref>
+    </list>
+  </struct>

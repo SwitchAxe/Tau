@@ -1,8 +1,9 @@
 (load "utility.ss");; for various utility functions
 (load "memoization.ss");; for the 'memoize' function
+(load "readfile.ss");; for file-reading utilities
 (define comment-start "<!--")
 (define comment-end "-->")
-
+;;----------------------various functions to prepare the document-----------------------------------
 (define (remove-comments-aux s comment?)
     (cond
         [(equal? s "") ""]
@@ -20,6 +21,13 @@
 
 (define (remove-comments s)
     (remove-comments-aux s #f))
+
+(define (remove-newlines s)
+    (list->string
+        (filter
+            (lambda (ch) (if (equal? ch #\newline) #f #t))
+            (string->list s))))
+
 
 (define (tag-not-opened-error)
     (raise
@@ -113,13 +121,10 @@
         (equal? (substring s 0 2) "</")
         (substring s 2 (sub1 (string-length s)))))
 
-;;returns #t if both lookahead and expected are chars, and also lookahead == expected.
-(define (match? lookahead expected)
-    (and
-        (and (char? lookahead) (char? expected))
-        (equal? lookahead expected)))
-
 (define (xml->list-aux xmlstring tagstack tag-openers result)
+    (printf
+        "xmlstring = ~s\ntagstack = ~s\nresult = ~s\n"
+        xmlstring tagstack result)
     (let [(nextchar (scar xmlstring))]
         (cond
             [(equal? nextchar #f)
@@ -131,11 +136,20 @@
                             (make-message-condition
                                 "Unclosed tags! Invalid XML.\n"))))]
             [(and
+                (>= (string-length xmlstring) 2)
+                (equal? (substring xmlstring 0 2) "/>"))
+                    ;;pop the current tag from the tagstack
+                    (set! tagstack (pop tagstack))
+                    (set! xmlstring
+                        (substring xmlstring 2 (string-length xmlstring)))
+                    (xml->list-aux xmlstring tagstack tag-openers result)]
+            [(and
                 (> (string-length xmlstring) 2)
                 (equal? (substring xmlstring 0 2) "</"))
                     (let* 
                         [(tag-closer (try-collect-tag xmlstring))
                         (closing-tag (substring tag-closer 2 (sub1 (string-length tag-closer))))]
+                            (printf "\n\nclosing tag = ~s\n\n" closing-tag)
                             (if (equal? (get-top tagstack) closing-tag)
                                 (begin
                                     (set! tagstack (pop tagstack))
@@ -153,14 +167,17 @@
                                             "Invalid XML: tags don't match!\n")))))]
             [(equal? nextchar #\<)
                 (let*
-                    [(tag-opener (xml-parse-tag xmlstring))
+                    [(rawtag (string-append (collect-until xmlstring #\>) ">"))
+                    (tag-opener (xml-parse-tag rawtag))
                     (opening-tag (symbol->string (car tag-opener)))]
-                        (set! tagstack (push opening-tag tagstack))
+                        (printf "tag-opener = ~s\n" tag-opener)
+                        (unless (equal? (string-ref rawtag (- (string-length rawtag) 2)) #\/)
+                            (set! tagstack (push opening-tag tagstack)))
                         (set!
                             xmlstring
                             (substring
                                 xmlstring
-                                (+ 1 (string-length (collect-until xmlstring #\>)))
+                                (string-length rawtag)
                                 (string-length xmlstring)))
                         (set! result (add tag-opener result))
                         (set! tag-openers (push tag-opener tag-openers))
@@ -169,14 +186,41 @@
                 (xml->list-aux (scdr xmlstring) tagstack tag-openers result)]
             [(equal? nextchar #\")
                 (set! xmlstring (scdr xmlstring))
-                (let [(strlit (collect-until xmlstring #\"))]
+                (let 
+                    [(strlit (collect-until xmlstring #\"))
+                    (innermost-tag (car (reverse result)))]
                     (and
                         strlit
                         (begin
-                            (set! result (add (string-append "\"" strlit "\"") result))
+                            (set! innermost-tag
+                                (add (string-append "\"" strlit "\"") innermost-tag))
+                            (set! result (add innermost-tag (pop result)))
                             (set! xmlstring
                                 (substring
                                     xmlstring
                                     (+ 1 (string-length strlit))
                                     (string-length xmlstring)))
-                            (xml->list-aux xmlstring tagstack tag-openers result))))])))
+                            (xml->list-aux xmlstring tagstack tag-openers result))))]
+            [(or
+                (char-alphabetic? nextchar)
+                (char-numeric? nextchar))
+                    (let
+                        [
+                            (constant
+                                (remove-trailing-spaces
+                                    (remove-leading-spaces
+                                        (collect-until xmlstring #\<))))
+                            (innermost-tag (car (reverse result)))]
+                        ;;cleaning the constant by removing (leading and trailing) whitespaces
+                        (and
+                            (not (null? tagstack))
+                            constant
+                            (begin
+                                (set! innermost-tag (add constant innermost-tag))
+                                (set! result (add innermost-tag (pop result)))
+                                (set! xmlstring
+                                    (substring
+                                        xmlstring
+                                        (string-length constant)
+                                        (string-length xmlstring)))
+                                (xml->list-aux xmlstring tagstack tag-openers result))))])))

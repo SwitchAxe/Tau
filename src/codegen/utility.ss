@@ -32,7 +32,8 @@
 (define (string-collect-until-aux s suffix news)
     (cond
         [(equal? s "") #f]
-        [(equal? (substring s 0 (string-length s)) suffix) (string-append news suffix)]
+        [(< (string-length s) (string-length suffix)) #f]
+        [(equal? (substring s 0 (string-length suffix)) suffix) (string-append news suffix)]
         [else
             (string-collect-until-aux
                 (scdr s)
@@ -45,7 +46,8 @@
 (define (add e p)
 	(cond
 		[(null? p) `(,e)]
-		[(null? (cdr p)) (cons (car p) (cons e '()))]
+		[(not (pair? p)) `(,p ,e)]
+        [(null? (cdr p)) (cons (car p) (cons e '()))]
 		[(not (pair? (cdr p))) (cons (car p) (cons (cdr p) e))]
 		[else (cons (car p) (add e (cdr p)))]))
 
@@ -54,3 +56,19 @@
 
 (define (list->number l)
     (string->number (list->string l)))
+
+(define (remove-leading-spaces s)
+    (cond
+        [(equal? s "") s]
+        [(char-alphabetic? (scar s)) s]
+        [else (reove-leading-spaces (scdr s))]))
+
+;;the wrapper function will accept a string and turn it into a list, for ease of use.
+(define (remove-trailing-spaces-aux l)
+    (cond
+        [(null? l) ""]
+        [(char-alphabetic? (car l)) (list->string (reverse l))]
+        [else (remove-trailing-spaces-aux (cdr l))]))
+
+(define (remove-trailing-spaces s)
+    (remove-trailing-spaces-aux (reverse (string->list s))))
