@@ -3,24 +3,42 @@
 (load "readfile.ss");; for file-reading utilities
 (define comment-start "<!--")
 (define comment-end "-->")
+(define cdata-start "<![CDATA[")
+(define cdata-end "]]>")
 ;;----------------------various functions to prepare the document-----------------------------------
-(define (remove-comments-aux s comment?)
+(define (remove-comments-aux s comment? news)
     (cond
-        [(equal? s "") ""]
+        [(< (string-length s) (string-length comment-end)) (string-append news s)]
+        [(< (string-length s) (string-length comment-start)) (string-append news s)]
         [(equal? (substring s 0 3) comment-end)
             (remove-comments-aux
                 (substring s 3 (string-length s))
-                (not comment?))]
+                (not comment?)
+                news)]
         [(equal? (substring s 0 4) comment-start)
-            (remove-comments-aux (scdr s) (not comment?))]
-        [comment? (remove-comments-aux (scdr s) comment?)]
+            (remove-comments-aux (scdr s) (not comment?) news)]
+        [comment? (remove-comments-aux (scdr s) comment? news)]
         [else
-            (string-append
-                (string (scar s))
-                (remove-comments-aux (scdr s) comment?))]))
+            (remove-comments-aux
+                (scdr s)
+                comment?
+                (string-append news (string (scar s))))]))
 
 (define (remove-comments s)
-    (remove-comments-aux s #f))
+    (remove-comments-aux s #f ""))
+
+(define (remove-cdata-aux s cdata? news)
+    (cond
+        [(equal? s "") news]
+        [cdata? (remove-cdata-aux (scdr s) cdata? news)]
+        [(equal? (substring s 0 3) cdata-end)
+            (remove-cdata-aux (substring s 3 (string-length s)) (not cdata?) news)]
+        [(equal? (substring s 0 9) cdata-start)
+            (remove-cdata-aux (substring s 9 (string-length s)) (not cdata?) news)]
+        [else (remove-cdata-aux (scdr s) cdata? (string-append news (string (scar s))))]))
+
+(define (remove-cdata s)
+    (remove-cdata-aux s #f ""))
 
 (define (remove-newlines s)
     (list->string
@@ -28,15 +46,34 @@
             (lambda (ch) (if (equal? ch #\newline) #f #t))
             (string->list s))))
 
+(define (has-xml-prolog? xmlstring)
+    (if (string-collect-until xmlstring "?>")
+        #t
+        #f))
 
-(define (tag-not-opened-error)
-    (raise
-        (condition
-            (make-error)
-            (make-message-condition
-                (format
-                    "Ill-formed XML: ~s tag closed without being opened!"
-                    curtag)))))
+
+(define (remove-xml-prolog xmlstring)
+    (if (has-xml-prolog? xmlstring)
+        (substring
+            xmlstring
+            (string-length (string-collect-until xmlstring "?>"))
+            (string-length xmlstring))
+        xmlstring))
+
+(define (has-xml-header? xmlstring)
+    (if (string-collect-until xmlstring "<xcb")
+        #t
+        #f))
+
+
+(define (remove-xcb-header xmlstring)
+    (if (has-xml-header? xmlstring)
+        (substring
+            xmlstring
+            (string-length (string-collect-until xmlstring ">"))
+            (- (string-length xmlstring) 6))
+        xmlstring))
+
 
 (define (try-collect-tag s)
     (let [(s1 (collect-until s #\space))]
@@ -57,11 +94,6 @@
     (reverse (cdr (reverse l))))
 (define (get-top l)
     (car (reverse l)))
-
-(define (xml-string-literal? s)
-    (and 
-        (equal? (car (string->list s)) #\")
-        (equal? (car (reverse (string->list s))) #\")))
 
 
 ;;returns #f in case of failure
@@ -122,6 +154,7 @@
         (substring s 2 (sub1 (string-length s)))))
 
 (define (xml->list-aux xmlstring tagstack tag-openers result)
+    (printf "xmlstring = ~s\ntagstack = ~s\n" xmlstring tagstack)
     (let [(nextchar (scar xmlstring))]
         (cond
             [(equal? nextchar #f)
@@ -144,7 +177,7 @@
                 (> (string-length xmlstring) 2)
                 (equal? (substring xmlstring 0 2) "</"))
                     (let* 
-                        [(tag-closer (try-collect-tag xmlstring))
+                        [(tag-closer (string-collect-until xmlstring ">"))
                         (closing-tag (substring tag-closer 2 (sub1 (string-length tag-closer))))]
                             (if (equal? (get-top tagstack) closing-tag)
                                 (begin
@@ -200,13 +233,11 @@
                 (char-alphabetic? nextchar)
                 (char-numeric? nextchar))
                     (let
-                        [
-                            (constant
-                                (remove-trailing-spaces
-                                    (remove-leading-spaces
-                                        (collect-until xmlstring #\<))))
-                            (innermost-tag (car (reverse result)))]
-                        ;;cleaning the constant by removing (leading and trailing) whitespaces
+                        [(constant
+                            (remove-trailing-spaces
+                                (remove-leading-spaces
+                                    (collect-until xmlstring #\<))))
+                        (innermost-tag (car (reverse result)))]
                         (and
                             (not (null? tagstack))
                             constant

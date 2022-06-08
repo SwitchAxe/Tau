@@ -60,15 +60,25 @@
 (define (remove-leading-spaces s)
     (cond
         [(equal? s "") s]
-        [(char-alphabetic? (scar s)) s]
-        [else (reove-leading-spaces (scdr s))]))
+        [(not (char-whitespace? (scar s))) s]
+        [else (remove-leading-spaces (scdr s))]))
 
 ;;the wrapper function will accept a string and turn it into a list, for ease of use.
 (define (remove-trailing-spaces-aux l)
     (cond
         [(null? l) ""]
-        [(char-alphabetic? (car l)) (list->string (reverse l))]
+        [(not (char-whitespace? (car l))) (list->string (reverse l))]
         [else (remove-trailing-spaces-aux (cdr l))]))
 
 (define (remove-trailing-spaces s)
     (remove-trailing-spaces-aux (reverse (string->list s))))
+
+(define (strlit? s)
+    (and
+        (equal? (string-ref s (sub1 (string-length s))) #\")
+        (equal? (scar s) #\")))
+
+(define (strlit->string s)
+    (if (strlit? s)
+        (substring s 1 (sub1 (string-length s)))
+        s))
