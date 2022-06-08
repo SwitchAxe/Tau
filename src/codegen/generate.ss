@@ -155,23 +155,24 @@
     (list->code-aux port l 0 l ""))
 
 ;;code to be executed, for tests
-(define filename
-    (open-file-output-port "xproto.ss" (file-options no-fail) (buffer-mode block) tx))
+;(define filename
+;    (open-file-output-port "xproto.ss" (file-options no-fail) (buffer-mode block) tx))
 
-(define xml
-    (remove-xcb-header
-        (remove-xml-prolog
-            (remove-cdata
-                (remove-comments
-                    (remove-newlines
-                        (file->string "../xml/xproto.xml")))))))
+;(define xml
+;    (remove-xcb-header
+;        (remove-xml-prolog
+;            (remove-cdata
+;                (remove-comments
+;                    (remove-newlines
+;                        (file->string "../xml/xproto.xml")))))))
 
-(define l (xml->list xml))
+(define xml (file->string "../xml/xproto.xml"))
+(define without-comments (remove-comments xml))
+;(define l (xml->list xml))
 
-(pretty-print l)
+;(pretty-print l)
 
-(list->code l filename)
+;(list->code l filename)
 
-(close-port filename)
-
+;(close-port filename)
 (exit)
