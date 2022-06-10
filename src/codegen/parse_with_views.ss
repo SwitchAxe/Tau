@@ -1,35 +1,10 @@
 (load "readfile.ss")
-
+(load "utility_with_views.ss")
 (define comment-start "<!--")
 (define comment-end "-->")
 (define cdata-start "<![CDATA[")
 (define cdata-end "]]>")
 
-
-(define-record-type string-view
-    (fields
-        (immutable s)
-        (mutable index)))
-
-(define (add e p)
-	(cond
-		[(null? p) `(,e)]
-		[(not (pair? p)) `(,p ,e)]
-        [(null? (cdr p)) (cons (car p) (cons e '()))]
-		[(not (pair? (cdr p))) (cons (car p) (cons (cdr p) e))]
-		[else (cons (car p) (add e (cdr p)))]))
-
-(define (sv-scar sv)
-    (and
-        (string-view? sv)
-        (string-ref (string-view-s sv) (string-view-index sv))))
-
-(define (sv-scdr sv)
-    (and
-        (string-view? sv)
-        (begin
-            (string-view-index-set! sv (+ 1 (string-view-index sv)))
-            sv)))
 
 (define (sv-remove-comments-aux sv comment? string-start string-end strings)
     (cond
@@ -164,6 +139,7 @@
             (filter
                 (lambda (ch) (if (equal? ch #\newline) #f #t))
                 (string->list (string-view-s sv))))))
+
 
 ;(define xml (file->string "../xml/xproto.xml"))
 
