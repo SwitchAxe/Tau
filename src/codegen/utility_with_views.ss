@@ -16,55 +16,84 @@
    [else (cons (car p) (add e (cdr p)))]))
 
 (define (sv-scar sv)
-  (and
-   (string-view? sv)
-   (string-ref (string-view-s sv) (string-view-index sv))))
+  (or
+   (and
+    (string-view? sv)
+    (not
+     (>= (string-view-index sv)
+     (string-length
+      (string-view-s sv))))
+    (string-ref (string-view-s sv) (string-view-index sv)))
+   #f))
 
 (define (sv-scdr sv)
   (and
    (string-view? sv)
-   (begin
-     (string-view-index-set! sv (+ 1 (string-view-index sv)))
-     sv)))
+   (make-string-view (string-view-s sv) (+ 1 (string-view-index sv)))))
 
 
 (define (sv-find-index-of-aux sv ch)
   (cond
-   [(equal? (string-view-string sv) "") #f]
+   [(<=
+     (- (string-length (string-view-s sv)) (string-view-index sv)) 0) #f]
    [(equal? (sv-scar sv) ch) (string-view-index sv)]
    [else (sv-find-index-of-aux (sv-scdr sv) ch)]))
 
 (define (sv-find-index-of sv ch)
   (and (string-view? sv) (sv-find-index-of-aux sv ch)))
 
+;; (define (sv-collect-until sv ch)
+;;   (and
+;;    (string-view? sv)
+;;    (let* [(idx (sv-find-index-of sv ch))]
+;;      (and
+;;       (number? idx)
+;;       (let [(new-sv )]
+;; 	(make-string-view
+;; 	 (substring
+;; 	  (string-view-s sv)
+;; 	  (string-view-index sv)
+;; 	  idx)
+;; 	 0))))))
+
 (define (sv-collect-until sv ch)
   (and
    (string-view? sv)
-   (let [(idx (sv-find-index-of sv ch))]
+   (let* [(old-idx (string-view-index sv))
+	  (idx (sv-find-index-of sv ch))]
      (and
       (number? idx)
-      (make-string-view (substring (string-view-s sv) 0 idx) 0)))))
+      (let [(new-sv (make-string-view
+		     (substring (string-view-s sv) old-idx idx)
+		     0))]
+	(string-view-index-set! sv old-idx)
+	new-sv)))))
 
-(define (sv-string-collect-until-aux sv suffix)
+
+(define (sv-string-collect-until-aux oldidx sv suffix)
   (cond
-   [(< (- (string-length (string-view-s sv)) (string-view-index sv)) (string-length suffix)) #f]
+   [(< (- (string-length (string-view-s sv)) (string-view-index sv)) (string-length suffix))
+    (string-view-index-set! sv oldidx)
+    #f]
    [(equal?
      (substring
       (string-view-s sv)
       (string-view-index sv)
       (+ (string-view-index sv) (string-length suffix)))
      suffix)
-    (make-string-view
-     (substring (string-view-s sv) 0 (+ (string-view-index sv) (string-length suffix)))
-     0)]
+    (let [(new-sv (make-string-view
+		   (substring (string-view-s sv) oldidx (+ (string-view-index sv) (string-length suffix)))
+		   0))]
+      (string-view-index-set! sv oldidx)
+      new-sv)]
    [else
     (string-view-index-set! sv (+ 1 (string-view-index sv)))
-    (sv-string-collect-until-aux sv suffix)]))
+    (sv-string-collect-until-aux oldidx sv suffix)]))
 
 (define (sv-string-collect-until sv suffix)
   (and
    (string-view? sv)
-   (string-collect-until-aux sv suffix)))
+   (sv-string-collect-until-aux (string-view-index sv) sv suffix)))
 
 (define (sv-remove-leading-whitespace sv)
   (cond
