@@ -5612,6 +5612,6 @@ The specified `resource` does not exist.
     but geez, malloc()ing a 262140 byte buffer just so I have something
     to hand to write(2) seems silly...!
   -->
-  <request name="NoOperation" opcode="127" />
+
 
 </xcb>

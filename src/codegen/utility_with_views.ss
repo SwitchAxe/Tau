@@ -42,19 +42,6 @@
 (define (sv-find-index-of sv ch)
   (and (string-view? sv) (sv-find-index-of-aux sv ch)))
 
-;; (define (sv-collect-until sv ch)
-;;   (and
-;;    (string-view? sv)
-;;    (let* [(idx (sv-find-index-of sv ch))]
-;;      (and
-;;       (number? idx)
-;;       (let [(new-sv )]
-;; 	(make-string-view
-;; 	 (substring
-;; 	  (string-view-s sv)
-;; 	  (string-view-index sv)
-;; 	  idx)
-;; 	 0))))))
 
 (define (sv-collect-until sv ch)
   (and

@@ -1,34 +1,34 @@
+(load "utility_with_views.ss")
 (load "utility.ss")
-(load "parse.ss")
+(load "parse_with_views.ss")
+(load "enum.ss")
 (load "../lib/bitwise.ss")
 (define tx
   (make-transcoder (utf-8-codec) (eol-style lf) (error-handling-mode raise)))
 
 ;;lists of the xml will be treated as C arrays.
-(define data-structures (list 'struct 'union 'xidunion))
+(define data-structures '(struct union xidunion))
 
 (define uint32s
-  (list 
-   'window 'pixmap 'cursor
-   'gcontext 'font 'colormap
-   'atom 'fontable 'visualid
-   'drawable 'bool32 'timestap
-   'keysym 'keycode32 'card32))
+  '(window pixmap cursor
+	   gcontext font colormap
+	   atom fontable visualid
+	   drawable bool32 timestap
+	   keysym keycode32 card32))
 
-(define uint8s
-  (list
-   'byte 'card8 'depth))
+(define uint8s '(byte card8 depth))
 
+(define int16s '(int16))
 
 ;;for turning XML tokens into valid chez scheme types.
 (define (safestring s)
   (strlit->string (string-downcase s)))
 
 
-(define (list->code-aux port l depth current-node list-type)
-  (display current-node) (newline)
+
+(define (list->code-aux port l current-node list-type)
   (cond
-   ;;the code generation was successful, report it back to the user.
+   ;;the code generation was successful.
    [(null? l) #t]
    [(pair? current-node)
     (cond
@@ -43,11 +43,31 @@
            (assoc
             'name
             (cdr current-node)))))
-        (car current-node)))
-      (list->code-aux port (cdr l) depth (cadr l) list-type)]
+        (if (equal? (car current-node) 'xidunion)
+	    'union
+	    (car current-node))))
+      (list->code-aux port (cdr l) (cadr l) list-type)]
+     [(equal? (car current-node) 'type)
+      (put-string port (format "[~s ~s]~a"
+			       (string->symbol (safestring (cadr current-node)))
+			       (let [(t (string->symbol
+					 (safestring
+					  (cadr current-node))))]
+				 (cond
+				  [(member t uint32s) 'unsigned-32]
+				  [(member t uint8s) 'unsigned-8]))
+			       (if (not (assoc 'type (list (cadr l))))
+				   "))\n"
+				   "\n    ")))
+      (list->code-aux port (cdr l) (cadr l) list-type)]
+     [(equal? (car current-node) 'typedef)
+      ;;we don't need to typedef anything since all our types are
+      ;;well-known before we start to generate the code
+      ;;(i looked them up and put them in lists accordingly)
+      ;;so we just skip the following element (an inner two-element list):
+      (list->code-aux port (cdr l) (cadr l) list-type)]
      [(equal? (car current-node) 'enum)
       (let [(enum-name (safestring (cadr (assoc 'name (cdr current-node)))))]
-        (put-string port "    ))\n")
         (put-string port
                     (format
                      "\n(define ~s (enum "
@@ -55,10 +75,19 @@
         (let loop [(enuml '()) (lc (cdr l)) (idx 0)]
           (cond
            [(null? lc)
-            (put-string port (format "'~s))\n" enuml))]
+	    (put-string port (format "'(~s"
+				     (car enuml)))
+	    (let inner [(enuml-cp (cdr enuml)) (elem (cadr enuml))]
+	      (cond
+	       [(not (null? (cdr enuml-cp)))
+		(put-string port (format "\n    ~s" elem))
+		(inner (cdr enuml-cp) (cadr enuml-cp))]
+	       [else
+		(put-string port (format "\n    ~s)))" elem))
+		(list->code-aux port (cdr l) (cadr l) list-type)]))]
            [(member (caar lc) data-structures)
             (loop enuml '() idx)
-            (list->code-aux port (cdr l) depth (cadr l) list-type)]
+            (list->code-aux port (cdr l) (cadr l) list-type)]
            [(equal? (caar lc) 'item)
             (loop
              (add
@@ -86,7 +115,7 @@
       (put-string
        port
        (format
-        "[~s ~s]~a    "
+        "[~s ~s]~a"
         (cond
          [(assoc 'enum (cdr current-node))
           (string->symbol
@@ -122,14 +151,20 @@
              [(member (string->symbol t) uint8s) "unsigned-8"]
              [(equal? (string->symbol t) 'bool) "boolean"]
              [(equal? (string->symbol t) 'card16) "unsigned-16"]
-             [else t]))))
-        (if (null? (cdr l)) "" "\n")))
-      (list->code-aux port (cdr l) depth (cadr l) list-type)]
+	     [(equal? (string->symbol t) 'int16) "integer-16"]
+	     [else t]))))
+        (if (or (null? (cdr l)) (not (member (caadr l) '(field pad))))
+	    "))\n"
+	    "\n    ")))
+      (list->code-aux port (cdr l) (cadr l) list-type)]
+     [(equal? (car current-node) 'pad)
+      (put-string port (format "[pad (array ~a unsigned-8)]))\n"
+			       (safestring (cadadr current-node))))
+      (list->code-aux port (cdr l) (cadr l) list-type)]
      [(equal? (car current-node) 'list)
       (list->code-aux
        port
        (cdr l)
-       depth
        (cadr l)
        (string->symbol
         (let [(t (safestring (cadr (assoc 'type (cdr current-node)))))]
@@ -145,34 +180,42 @@
         (string->symbol (cadr current-node))
         list-type
         (if (null? (cdr l)) "" "\n")))
-      (list->code-aux port (cdr l) depth (cadr l) list-type)]
+      (list->code-aux port (cdr l) (cadr l) list-type)]
+     [(equal? (car current-node) 'xidtype)
+      (put-string port (format "(define-ftype ~s unsigned-32)\n"
+			       (string->symbol
+				(safestring
+				 (cadr
+				  (assoc
+				   'name
+				   (cdr current-node)))))))
+      (list->code-aux port (cdr l) (cadr l) list-type)]
      [(pair? (car current-node))
-      (list->code-aux port l depth (car current-node) list-type)])]
+      (list->code-aux port l (car current-node) list-type)])]
    [else
     #f]))
 
 (define (list->code l port)
-  (list->code-aux port l 0 l ""))
+  (put-string port "(load \"enum.ss\")\n")
+  (list->code-aux port l l ""))
 
 ;;code to be executed, for tests
-;; (define filename
-;;   (open-file-output-port "xproto.ss" (file-options no-fail) (buffer-mode block) tx))
+(define filename
+  (open-file-output-port "xproto.ss" (file-options no-fail) (buffer-mode block) tx))
 
-;; (define xml
-;;   (remove-xcb-header
-;;    (remove-xml-prolog
-;;     (remove-cdata
-;;      (remove-comments
-;;       (remove-newlines
-;;        (file->string "../xml/xproto.xml")))))))
- 
-;; (define xml (file->string "../xml/xproto.xml"))
-;;(define without-comments (remove-comments xml))
-;;(define l (xml->list xml))
+(define xml
+  (sv-remove-xcb-header
+   (sv-remove-xml-prolog
+    (sv-remove-cdata
+     (sv-remove-comments
+      (sv-remove-newlines
+       (file->string-view "../xml/xproto.xml")))))))
 
-;;(pretty-print l)
+(define l (sv-xml->list xml))
 
-;;(list->code l filename)
+(pretty-print l)
 
-;;(close-port filename)
+(list->code l filename)
+
+(close-port filename)
 (exit)

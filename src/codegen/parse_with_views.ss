@@ -79,10 +79,6 @@
    (sv-remove-comments-aux sv #f 0 0 '())))
 
 (define (sv-remove-cdata-aux sv cdata? string-start string-end strings)
-  (printf
-   "s = ~s\nstring-start = ~s\nstring-end = ~s\n"
-   (substring (string-view-s sv) (string-view-index sv) (string-length (string-view-s sv)))
-   string-start string-end)
   (cond
    [(= (string-view-index sv) (string-length (string-view-s sv)))
     (make-string-view
@@ -150,11 +146,11 @@
 
 (define (sv-remove-xml-prolog xml-sv)
   (and
-   (has-xml-prolog? xml-sv)
+   (sv-has-xml-prolog? xml-sv)
    (make-string-view
     (substring
      (string-view-s xml-sv)
-     (string-length (sv-string-collect-until xml-sv "?>"))
+     (string-length (string-view-s (sv-string-collect-until xml-sv "?>")))
      (string-length (string-view-s xml-sv)))
     0)))
 
@@ -165,12 +161,12 @@
 ;;after a successful call to 'remove-xml-prolog'!
 (define (sv-remove-xcb-header xml-sv)
   (and
-   (has-xcb-header? xml-sv)
+   (sv-has-xcb-header? xml-sv)
    (make-string-view
     (substring
      (string-view-s xml-sv)
-     (string-length (sv-string-collect-until ">"))
-     (- (string-length (string-view-s xml-sv)) 6))
+     (string-length (string-view-s (sv-string-collect-until xml-sv ">")))
+     (- (string-length (string-view-s xml-sv)) 5))
     0)))
 
 (define (sv-try-collect-tag sv)
@@ -277,10 +273,8 @@
 (define (sv-xml->list-aux xmlstring tagstack result)
   (let [(nextchar (sv-scar xmlstring))
 	(idx (string-view-index xmlstring))]
-    (printf "\nnextchar = ~s\nindex = ~s\ntagstack = ~s\n" nextchar idx tagstack)
     (cond
      [(not nextchar)
-      (display "stream finished!\n")
       (if (null? tagstack)
 	  result
 	  (raise
@@ -291,13 +285,11 @@
      [(and
        (>= (- (string-length (string-view-s xmlstring)) idx) 2)
        (equal? (substring (string-view-s xmlstring) idx (+ idx 2)) "/>"))
-      (display "parsing a closing tag!\n")
       (string-view-index-set! xmlstring (+ idx 2))
       (sv-xml->list-aux xmlstring (pop tagstack) result)]
      [(and
        (>= (- (string-length (string-view-s xmlstring)) idx) 2)
        (equal? (substring (string-view-s xmlstring) idx (+ idx 2)) "</"))
-      (printf "parsing a closing tag!\n")
       (let* [(tag-closer (sv-string-collect-until xmlstring ">"))
 	     (raw-closer (string-view-s tag-closer))
 	     (closing-tag (substring raw-closer 2 (sub1 (string-length raw-closer))))]
@@ -311,13 +303,11 @@
 	      (make-message-condition
 	       "In sv-xml->list: closing tag and opening tag don't match!")))))]
      [(equal? nextchar #\<)
-      (display "parsing a tag!\n")
       (let* [(tag-opener (sv-string-collect-until xmlstring ">"))
 	     (raw-tag-opener (string-view-s tag-opener))
 	     (parsed-tag-opener (sv-xml-parse-tag tag-opener))
 	     (tagsymbol (car parsed-tag-opener))
 	     (tagstring (symbol->string tagsymbol))]
-	(printf "raw-tag-opener = ~s\nparsed = ~s" raw-tag-opener parsed-tag-opener)
 	(unless
 	    (equal?
 	     (string-ref raw-tag-opener (- (string-length raw-tag-opener) 2))
@@ -329,10 +319,8 @@
 	 tagstack	 
 	 (push parsed-tag-opener result)))]
      [(char-whitespace? nextchar)
-      (display "skipping a whitespace!\n")
       (sv-xml->list-aux (sv-scdr xmlstring) tagstack result)]
      [(equal? nextchar #\")
-      (display "parsing a string literal!\n")
       (set! xmlstring (sv-scdr xmlstring))
       (let* [(strlit (sv-collect-until xmlstring #\"))
 	     (raw-strlit (string-view-s strlit))
@@ -352,7 +340,6 @@
 				    (string-length raw-strlit)))
 	   (sv-xml->list-aux xmlstring tagstack result))))]
      [(or (char-alphabetic? nextchar) (char-numeric? nextchar))
-      (display "parsing a constant!\n")
       (or
        (and
 	(not (null? tagstack))
