@@ -4841,7 +4841,7 @@ TODO: reasons?
     </doc>
   </request>
 
-  <enum name= "ColormapAlloc">
+  <enum name="ColormapAlloc">
     <item name="None"><value>0</value></item>
     <item name="All"> <value>1</value></item>
   </enum>
@@ -5568,8 +5568,7 @@ The specified `resource` does not exist.
         <fieldref>map_len</fieldref>
       </list>
     </reply>
-  </request>
-  
+  </request>  
   <enum name="MapIndex">
     <item name="Shift">  <value>0</value></item>
     <item name="Lock">   <value>1</value></item>
