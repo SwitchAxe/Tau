@@ -1,5 +1,4 @@
 (load "utility_with_views.ss")
-(load "utility.ss")
 (load "parse_with_views.ss")
 (load "enum.ss")
 (load "../lib/bitwise.ss")
@@ -24,13 +23,17 @@
 (define (safestring s)
   (strlit->string (string-downcase s)))
 
-(define (list->code-aux port l current-node request-name needs-reply?)
+(define (list->code-aux port l current-node request-name needs-reply? npad)
   (printf "current node = ~s\n" current-node)
   (cond
    ;;the code generation was successful.
    [(null? l) #t]
    [(pair? current-node)
     (cond
+     [needs-reply? ;;reply to a request struct
+      (put-string port (format "(define-ftype ~s-reply\n  (struct\n    "
+			       (string->symbol (safestring request-name))))
+      (list->code-aux port (cdr l) (cadr l) "" #f 0)]
      [(member (car current-node) (add 'switch data-structures))
       (put-string
        port
@@ -47,25 +50,26 @@
 	   [(equal? dast 'xidunion) 'union]
 	   [(equal? dast 'switch) 'struct]
 	   [else dast]))))
-      (list->code-aux port (cdr l) (cadr l) "" #f)]
+      (list->code-aux port (cdr l) (cadr l) "" #f 0)]
      [(equal? (car current-node) 'request)
-      (if (equal? (caadr l) 'reply)
-	  (list->code-aux port (cdr l) (cadr l) (cadr (assoc 'name (cdr current-node))) #t)
-	  (let [(opcode (assoc 'opcode (cdr current-node)))
-		(reqname (assoc 'name (cdr current-node)))]
-	    (when opcode
-	      (put-string port (format "(define ~s-opcode ~s)\n"
-				       (string->symbol (safestring (cadr reqname)))
-				       (string->number (safestring (cadr opcode))))))
-	    (put-string port (format "(define-ftype ~s\n  (struct\n    "
-				     (string->symbol (safestring (cadr reqname)))))
-	    (list->code-aux port (cdr l) (cadr l) (cadr reqname) #f)))]
+      (cond
+       [(member (caadr l) '(bitcase see example doc description list op brief))
+	;;truncate the next node in the list and append the current one instead
+	(list->code-aux port (append current-node (cddr l)) (caddr l) "" #f 0)]
+       [(equal? (caadr l) 'reply)
+	(list->code-aux port (cdr l) (cadr l) (cadr (assoc 'name (cdr current-node))) #t 0)]
+       [else
+	(let [(opcode (assoc 'opcode (cdr current-node)))
+	      (reqname (assoc 'name (cdr current-node)))]
+	  (when opcode
+	    (put-string port (format "(define ~s-opcode ~s)\n"
+				     (string->symbol (safestring (cadr reqname)))
+				     (string->number (safestring (cadr opcode))))))
+	  (put-string port (format "(define-ftype ~s\n  (struct\n    "
+				   (string->symbol (safestring (cadr reqname)))))
+	  (list->code-aux port (cdr l) (cadr l) (cadr reqname) #f 0))])]
      [(equal? (car current-node) 'reply)
-      (list->code-aux port (cdr l) (cadr l) request-name #t)]
-     [needs-reply? ;;reply to a request struct
-      (put-string port (format "(define-ftype ~s-reply\n  (struct\n    "
-			       (string->symbol (safestring request-name))))
-      (list->code-aux port (cdr l) (cadr l) "" #f)]
+      (list->code-aux port l (car l) request-name #t 0)]
      [(equal? (car current-node) 'type)
       (put-string port (format "[~s ~s]~a"
 			       (string->symbol (safestring (cadr current-node)))
@@ -78,7 +82,7 @@
 			       (if (not (assoc 'type (list (cadr l))))
 				   "))\n"
 				   "\n    ")))
-      (list->code-aux port (cdr l) (cadr l) request-name needs-reply?)]
+      (list->code-aux port (cdr l) (cadr l) request-name needs-reply? npad)]
      [(equal? (car current-node) 'event)
       (put-string port (format "[~s ~s]~a"
 			  (string->symbol
@@ -89,16 +93,22 @@
 			   (safestring
 			    (cadr
 			     (assoc 'number (cdr current-node)))))
-			  (if (or (null? (cdr l)) (member (cadr l) (add 'enum data-structures)))
+			  (if (or (null? (cdr l)) (or
+						   needs-reply?
+						   (not (member (cadr l)
+								(append '(enumref field pad error event)
+									'(bitcase doc description see
+										  example brief list
+										  op fieldref))))))
 			      "\n"
 			      "\n    ")))
-      (list->code-aux port (cdr l) (cadr l) request-name needs-reply?)]
+      (list->code-aux port (cdr l) (cadr l) request-name needs-reply? npad)]
      [(equal? (car current-node) 'typedef)
       ;;we don't need to typedef anything since all our types are
       ;;well-known before we start to generate the code
       ;;(i looked them up and put them in lists accordingly)
       ;;so we just skip the following element (an inner two-element list):
-      (list->code-aux port (cdr l) (cadr l) "" #f)]
+      (list->code-aux port (cdr l) (cadr l) "" #f 0)]
      [(equal? (car current-node) 'enum)
       (let [(enum-name (safestring (cadr (assoc 'name (cdr current-node)))))]
         (put-string port
@@ -113,15 +123,15 @@
 	    (if (= (length enuml) 1)
 		(begin
 		  (put-string port ")))\n")
-		  (list->code-aux port lc (car lc) "" #f))
+		  (list->code-aux port lc (car lc) "" #f 0))
 		(let inner [(enuml-cp (cdr enuml)) (elem (cadr enuml))]
 		  (cond
 		   [(null? (cdr enuml-cp))
 		    (put-string port (format "\n    ~s)))\n" (car enuml-cp)))
-		    (list->code-aux port lc (car lc) "" #f)]
+		    (list->code-aux port lc (car lc) "" #f 0)]
 		   [(null? enuml-cp)
 		    (put-string port (format "\n    ~s)))\n" elem))
-		    (list->code-aux port lc (car lc) "" #f)]
+		    (list->code-aux port lc (car lc) "" #f 0)]
 		   [else
 		    (put-string port (format "\n    ~s" elem))
 		    (inner (cdr enuml-cp) (if (null? (cdr enuml-cp))
@@ -152,78 +162,118 @@
             (loop enuml (cdr lc) (+ 1 idx))])))]
      [(member (car current-node) '(field exprfield))
       (if (< (length (cdr current-node)) 2)
-	  (list->code-aux port (cdr l) (cadr l) request-name needs-reply?)
-	  (put-string
-	   port
-	   (format
-            "[~s ~s]~a"
-            (cond
-             [(assoc 'enum (cdr current-node))
+	  (list->code-aux port (cdr l) (cadr l) request-name needs-reply? npad)
+	  (begin
+	    (put-string
+	     port
+	     (format
+              "[~s ~s]~a"
+              (cond
+               [(assoc 'enum (cdr current-node))
+		(string->symbol
+		 (string-append
+		  (safestring
+		   (cadr
+		    (assoc 'name (cdr current-node))))
+		  "-enum"))]
+               [(assoc 'mask (cdr current-node))
+		(string->symbol
+		 (string-append
+		  (safestring
+		   (cadr
+		    (assoc 'name (cdr current-node))))
+		  "-mask"))]
+               [else
+		(string->symbol
+		 (safestring
+		  (cadr
+		   (assoc 'name (cdr current-node)))))])
               (string->symbol
-               (string-append
-		(safestring
-		 (cadr
-		  (assoc 'name (cdr current-node))))
-		"-enum"))]
-             [(assoc 'mask (cdr current-node))
-              (string->symbol
-               (string-append
-		(safestring
-		 (cadr
-		  (assoc 'name (cdr current-node))))
-		"-mask"))]
-             [else
-              (string->symbol
-               (safestring
-		(cadr
-		 (assoc 'name (cdr current-node)))))])
-            (string->symbol
-             (strlit->string
-              (let
-		  [(t (safestring (cadr (assoc 'type (cdr current-node)))))]
-		(cond
-		 [(member (string->symbol t) uint32s) "unsigned-32"]
-		 [(member (string->symbol t) uint8s) "unsigned-8"]
-		 [(equal? (string->symbol t) 'bool) "boolean"]
-		 [(equal? (string->symbol t) 'card16) "unsigned-16"]
-		 [(equal? (string->symbol t) 'int16) "integer-16"]
-		 [else t]))))
-            (if (or (null? (cdr l)) (not (member (caadr l)
-						 '(bitcase enumref field pad error))))
-		"))\n"
-		"\n    "))))
-      (list->code-aux port (cdr l) (cadr l) request-name needs-reply?)]
+               (strlit->string
+		(let
+		    [(t (safestring (cadr (assoc 'type (cdr current-node)))))]
+		  (cond
+		   [(member (string->symbol t) uint32s) "unsigned-32"]
+		   [(member (string->symbol t) uint8s) "unsigned-8"]
+		   [(equal? (string->symbol t) 'bool) "boolean"]
+		   [(equal? (string->symbol t) 'card16) "unsigned-16"]
+		   [(equal? (string->symbol t) 'int16) "integer-16"]
+		   [else t]))))
+              (if (or (null? (cdr l)) (or
+				       needs-reply?
+				       (not (member (caadr l)
+						    (append
+						     ;;the ones we need
+						     '(enumref field pad error)
+						     ;;the ones we ignore
+						     '(list op fieldref
+							    bitcase doc brief
+							    description see example))))))
+		  "))\n"
+		  "\n    ")))
+	    (list->code-aux port (cdr l) (cadr l) request-name needs-reply? npad)))]
      [(equal? (car current-node) 'enumref)
       (put-string port (format "[~s ~s]~a"
 			       (string->symbol (caddr current-node))
 			       'unsigned-32
-			       (if (or (null? (cdr l)) (not (member (caadr l)
-								    '(bitcase enumref field pad error))))
+			       (if (or (null? (cdr l)) (or
+							needs-reply?
+							(not (member (caadr l)
+								     (append
+								      ;;the ones we need
+								      '(enumref field pad error)
+								      ;;the ones we ignore
+								      '(list op fieldref
+									     bitcase doc brief
+									     description see example))))))
 				   "))\n"
 				   "\n    ")))
-      (list->code-aux port (cdr l) (cadr l) request-name needs-reply?)]
+      (list->code-aux port (cdr l) (cadr l) request-name needs-reply? npad)]
      [(equal? (car current-node) 'pad)
-      (put-string port (format "[pad (array ~a unsigned-8)]~a"
+      (printf "found a pad! the next element in the list is: ~s\n\n\n\n\n\n"
+	      (caadr l))
+      (put-string port (format "[pad~s (array ~a unsigned-8)]~a"
+			       npad
 			       (safestring (cadadr current-node))
-			       (if (or (null? (cdr l)) (not (member (caadr l)
-								    '(bitcase enumref field pad error))))
+			       (if (or (null? (cdr l)) (or
+							needs-reply?
+							(not (member (caadr l)
+								     (append
+								      ;;the ones we need
+								      '(enumref field pad error)
+								      ;;the ones we ignore
+								      '(list op fieldref
+									     bitcase doc brief
+									     description see example))))))
 				   "))\n"
 				   "\n    ")))
-      (list->code-aux port (cdr l) (cadr l) request-name needs-reply?)]
+      (list->code-aux port (cdr l) (cadr l) request-name needs-reply? (add1 npad))]
      [(equal? (car current-node) 'error)
       (let [(errt (assoc 'type (cdr current-node)))]
 	(put-string port (format "[~s-err unsigned-32]~a"
 				 (string->symbol (safestring (cadr errt)))
-				 (if (or (null? (cdr l)) (not (member (caadr l)
-								      '(bitcase enumreffield pad error))))
+				 (if (or (null? (cdr l)) (or
+							  needs-reply?
+							  (not (member (caadr l)
+								       (append
+									;;the ones we need
+									'(enumref field pad error)
+									;;the ones we ignore
+									'(list op fieldref
+									       bitcase doc brief
+									       description see example))))))
 				     "))\n"
 				     "\n    ")))
-	(list->code-aux port (cdr l) (cadr l) request-name needs-reply?))]
+	(list->code-aux port (cdr l) (cadr l) request-name needs-reply? npad))]
      [(member (car current-node)
 	      '(list op fieldref bitcase doc brief description see example)) ;;just skip it
-      (if (equal? (caadr l) 'value)
-	  (list->code-aux port (cddr l) (caddr l) request-name needs-reply?)
-	  (list->code-aux port (cdr l) (cadr l) request-name needs-reply?))]
+      (cond
+       [(and (null? (cddr l)) (equal? (caadr l) 'value))
+	#t] ;;code generation was successful.
+       [(equal? (caadr l) 'value)
+	(list->code-aux port (cddr l) (caddr l) request-name needs-reply? npad)]
+       [else
+	(list->code-aux port (cdr l) (cadr l) request-name needs-reply? npad)])]
      [(equal? (car current-node) 'xidtype)
       (put-string port (format "(define-ftype ~s unsigned-32)\n"
 			       (string->symbol
@@ -232,13 +282,13 @@
 				  (assoc
 				   'name
 				   (cdr current-node)))))))
-      (list->code-aux port (cdr l) (cadr l) "" #f)])]
+      (list->code-aux port (cdr l) (cadr l) "" #f 0)])]
    [else
     #f]))
 
 (define (list->code l port)
   (put-string port "(load \"enum.ss\")\n")
-  (list->code-aux port l (car l) "" #f))
+  (list->code-aux port l (car l) "" #f 0))
 
 ;;code to be executed, for tests
 (define filename

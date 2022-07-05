@@ -126,3 +126,18 @@
      (substring (string-view-s sv) 1 (sub1 (string-length (string-view-s sv))))
      0))
    sv))
+
+;;general utilities, for example to convert string literals
+;;to strings without double quotes
+
+(define (strlit? s)
+  (and
+   (equal? (string-ref s 0) #\")
+   (equal? (string-ref s (sub1 (string-length s))) #\")))
+
+(define (strlit->string s)
+  (or
+   (and
+    (strlit? s)
+    (substring s 1 (sub1 (string-length s))))
+   s))

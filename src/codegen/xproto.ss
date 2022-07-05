@@ -41,7 +41,7 @@
     [depth unsigned-8]
     [bits_per_pixel unsigned-8]
     [scanline_pad unsigned-8]
-    [pad (array 5 unsigned-8)]))
+    [pad0 (array 5 unsigned-8)]))
 
 (define visualclass (enum '((visualclass-staticgray 0)
     (visualclass-grayscale 1)
@@ -58,14 +58,14 @@
     [red_mask unsigned-32]
     [green_mask unsigned-32]
     [blue_mask unsigned-32]
-    [pad (array 4 unsigned-8)]))
+    [pad0 (array 4 unsigned-8)]))
 (define-ftype depth
   (struct
     [depth unsigned-8]
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [visuals_len unsigned-16]
-    [pad (array 4 unsigned-8)]))
-
+    [pad1 (array 4 unsigned-8)]
+    
 (define eventmask (enum '((eventmask-noevent 0)
     (eventmask-keypress 1)
     (eventmask-keyrelease 2)
@@ -113,37 +113,37 @@
     [backing_stores-enum unsigned-8]
     [save_unders boolean]
     [root_depth unsigned-8]
-    [allowed_depths_len unsigned-8]))
-(define-ftype setuprequest
+    [allowed_depths_len unsigned-8]
+    (define-ftype setuprequest
   (struct
     [byte_order unsigned-8]
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [protocol_major_version unsigned-16]
     [protocol_minor_version unsigned-16]
     [authorization_protocol_name_len unsigned-16]
     [authorization_protocol_data_len unsigned-16]
-    [pad (array 2 unsigned-8)]))
-[pad (array 4 unsigned-8)]))
-[pad (array 4 unsigned-8)]))
+    [pad1 (array 2 unsigned-8)]
+    [pad2 (array 4 unsigned-8)]
+    [pad3 (array 4 unsigned-8)]))
 (define-ftype setupfailed
   (struct
     [status unsigned-8]
     [reason_len unsigned-8]
     [protocol_major_version unsigned-16]
     [protocol_minor_version unsigned-16]
-    [length unsigned-16]))
-(define-ftype setupauthenticate
+    [length unsigned-16]
+    (define-ftype setupauthenticate
   (struct
     [status unsigned-8]
-    [pad (array 5 unsigned-8)]
-    [length unsigned-16]))
-
+    [pad0 (array 5 unsigned-8)]
+    [length unsigned-16]
+    
 (define imageorder (enum '((imageorder-lsbfirst 0)
     (imageorder-msbfirst 1))))
 (define-ftype setup
   (struct
     [status unsigned-8]
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [protocol_major_version unsigned-16]
     [protocol_minor_version unsigned-16]
     [length unsigned-16]
@@ -161,9 +161,9 @@
     [bitmap_format_scanline_pad unsigned-8]
     [min_keycode keycode]
     [max_keycode keycode]
-    [pad (array 4 unsigned-8)]))
-[pad (array 4 unsigned-8)]))
-
+    [pad1 (array 4 unsigned-8)]
+    [pad2 (array 4 unsigned-8)]
+    
 (define modmask (enum '((modmask-shift 1)
     (modmask-lock 2)
     (modmask-control 4)
@@ -304,11 +304,11 @@
 (define-ftype clientmessagedata
   (union
     [clientmessage 33]
-    [format unsigned-8]
+[format unsigned-8]
     [window unsigned-32]
     [type unsigned-32]
-    [data clientmessagedata]))
-
+    [data clientmessagedata]
+    
 (define mapping (enum '((mapping-modifier 0)
     (mapping-keyboard 1)
     (mapping-pointer 2))))
@@ -393,18 +393,18 @@
     [Colormap unsigned-32]
     [colormap unsigned-32]
     [Cursor unsigned-32]
-    [cursor unsigned-32]))
-[colormap-err unsigned-32]
+    [cursor unsigned-32]
+    [colormap-err unsigned-32]
     [match-err unsigned-32]
     [cursor-err unsigned-32]
     [pixmap-err unsigned-32]
     [value-err unsigned-32]
     [window-err unsigned-32]
-    [alloc-err unsigned-32]))
-(define changewindowattributes-opcode 2)
+    [alloc-err unsigned-32]
+    (define changewindowattributes-opcode 2)
 (define-ftype changewindowattributes
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [window unsigned-32]
     [value_mask-mask unsigned-32]))
 (define-ftype value_list
@@ -438,8 +438,8 @@
     [Colormap unsigned-32]
     [colormap unsigned-32]
     [Cursor unsigned-32]
-    [cursor unsigned-32]))
-[access-err unsigned-32]
+    [cursor unsigned-32]
+    [access-err unsigned-32]
     [colormap-err unsigned-32]
     [cursor-err unsigned-32]
     [match-err unsigned-32]
@@ -453,10 +453,11 @@
 (define getwindowattributes-opcode 3)
 (define-ftype getwindowattributes
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [window unsigned-32]))
 (define-ftype getwindowattributes-reply
   (struct
+    [backing_store-enum unsigned-8]
     [visual unsigned-32]
     [class-enum unsigned-16]
     [bit_gravity-enum unsigned-8]
@@ -471,19 +472,19 @@
     [all_event_masks-mask unsigned-32]
     [your_event_mask-mask unsigned-32]
     [do_not_propagate_mask-mask unsigned-16]
-    [pad (array 2 unsigned-8)]))
-[window-err unsigned-32]
+    [pad0 (array 2 unsigned-8)]
+    [window-err unsigned-32]
     [drawable-err unsigned-32]))
 (define destroywindow-opcode 4)
 (define-ftype destroywindow
   (struct
-    [pad (array 1 unsigned-8)]
-    [window unsigned-32]))
-[window-err unsigned-32]))
-(define destroysubwindows-opcode 5)
+    [pad0 (array 1 unsigned-8)]
+    [window unsigned-32]
+    [window-err unsigned-32]
+    (define destroysubwindows-opcode 5)
 (define-ftype destroysubwindows
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [window unsigned-32]))
 
 (define setmode (enum '((setmode-insert 0)
@@ -492,41 +493,41 @@
 (define-ftype changesaveset
   (struct
     [mode-enum unsigned-8]
-    [window unsigned-32]))
-[match-err unsigned-32]
+    [window unsigned-32]
+    [match-err unsigned-32]
     [value-err unsigned-32]
-    [window-err unsigned-32]))
-(define reparentwindow-opcode 7)
+    [window-err unsigned-32]
+    (define reparentwindow-opcode 7)
 (define-ftype reparentwindow
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [window unsigned-32]
     [parent unsigned-32]
     [x integer-16]
-    [y integer-16]))
-[match-err unsigned-32]
-    [window-err unsigned-32]))
-(define mapwindow-opcode 8)
+    [y integer-16]
+    [match-err unsigned-32]
+    [window-err unsigned-32]
+    (define mapwindow-opcode 8)
 (define-ftype mapwindow
   (struct
-    [pad (array 1 unsigned-8)]
-    [window unsigned-32]))
-[match-err unsigned-32]))
-(define mapsubwindows-opcode 9)
+    [pad0 (array 1 unsigned-8)]
+    [window unsigned-32]
+    [match-err unsigned-32]
+    (define mapsubwindows-opcode 9)
 (define-ftype mapsubwindows
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [window unsigned-32]))
 (define unmapwindow-opcode 10)
 (define-ftype unmapwindow
   (struct
-    [pad (array 1 unsigned-8)]
-    [window unsigned-32]))
-[window-err unsigned-32]))
-(define unmapsubwindows-opcode 11)
+    [pad0 (array 1 unsigned-8)]
+    [window unsigned-32]
+    [window-err unsigned-32]
+    (define unmapsubwindows-opcode 11)
 (define-ftype unmapsubwindows
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [window unsigned-32]))
 
 (define configwindow (enum '((configwindow-x 1)
@@ -545,10 +546,10 @@
 (define configurewindow-opcode 12)
 (define-ftype configurewindow
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [window unsigned-32]
     [value_mask-mask unsigned-16]
-    [pad (array 2 unsigned-8)]))
+    [pad1 (array 2 unsigned-8)]))
 (define-ftype value_list
   (struct
     [X unsigned-32]
@@ -564,68 +565,72 @@
     [Sibling unsigned-32]
     [sibling unsigned-32]
     [StackMode unsigned-32]
-    [stack_mode-enum unsigned-32]))
-[match-err unsigned-32]
+    [stack_mode-enum unsigned-32]
+    [match-err unsigned-32]
     [window-err unsigned-32]
-    [value-err unsigned-32]))
-
+    [value-err unsigned-32]
+    
 (define circulate (enum '((circulate-raiselowest 0)
     (circulate-lowerhighest 1))))
 (define circulatewindow-opcode 13)
 (define-ftype circulatewindow
   (struct
     [direction-enum unsigned-8]
-    [window unsigned-32]))
-[window-err unsigned-32]
+    [window unsigned-32]
+    [window-err unsigned-32]
     [value-err unsigned-32]))
 (define getgeometry-opcode 14)
 (define-ftype getgeometry
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [drawable unsigned-32]))
 (define-ftype getgeometry-reply
   (struct
+    [depth unsigned-8]
     [root unsigned-32]
     [x integer-16]
     [y integer-16]
     [width unsigned-16]
     [height unsigned-16]
     [border_width unsigned-16]
-    [pad (array 2 unsigned-8)]))
-[drawable-err unsigned-32]
-    [window-err unsigned-32]))
-(define querytree-opcode 15)
+    [pad0 (array 2 unsigned-8)]
+    [drawable-err unsigned-32]
+    [window-err unsigned-32]
+    (define querytree-opcode 15)
 (define-ftype querytree
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [window unsigned-32]))
 (define-ftype querytree-reply
   (struct
+    [pad0 (array 1 unsigned-8)]
     [root unsigned-32]
     [parent unsigned-32]
     [children_len unsigned-16]
-    [pad (array 14 unsigned-8)]))
-(define internatom-opcode 16)
+    [pad1 (array 14 unsigned-8)]
+    (define internatom-opcode 16)
 (define-ftype internatom
   (struct
     [only_if_exists boolean]
     [name_len unsigned-16]
-    [pad (array 2 unsigned-8)]))
-(define-ftype internatom-reply
+    [pad0 (array 2 unsigned-8)]
+    (define-ftype internatom-reply
   (struct
-    [atom unsigned-32]))
-[alloc-err unsigned-32]
-    [value-err unsigned-32]))
-(define getatomname-opcode 17)
+    [pad0 (array 1 unsigned-8)]
+    [atom unsigned-32]
+    [alloc-err unsigned-32]
+    [value-err unsigned-32]
+    (define getatomname-opcode 17)
 (define-ftype getatomname
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [atom unsigned-32]))
 (define-ftype getatomname-reply
   (struct
+    [pad0 (array 1 unsigned-8)]
     [name_len unsigned-16]
-    [pad (array 22 unsigned-8)]))
-
+    [pad1 (array 22 unsigned-8)]
+    
 (define propmode (enum '((propmode-replace 0)
     (propmode-prepend 1)
     (propmode-append 2))))
@@ -637,17 +642,17 @@
     [property unsigned-32]
     [type unsigned-32]
     [format unsigned-8]
-    [pad (array 3 unsigned-8)]
-    [data_len unsigned-32]))
-[match-err unsigned-32]
+    [pad0 (array 3 unsigned-8)]
+    [data_len unsigned-32]
+    [match-err unsigned-32]
     [value-err unsigned-32]
     [window-err unsigned-32]
     [atom-err unsigned-32]
-    [alloc-err unsigned-32]))
-(define deleteproperty-opcode 19)
+    [alloc-err unsigned-32]
+    (define deleteproperty-opcode 19)
 (define-ftype deleteproperty
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [window unsigned-32]
     [property unsigned-32]))
 
@@ -663,43 +668,46 @@
     [long_length unsigned-32]))
 (define-ftype getproperty-reply
   (struct
+    [format unsigned-8]
     [type unsigned-32]
     [bytes_after unsigned-32]
     [value_len unsigned-32]
-    [pad (array 12 unsigned-8)]))
-[window-err unsigned-32]
+    [pad0 (array 12 unsigned-8)]
+    [window-err unsigned-32]
     [atom-err unsigned-32]
-    [value-err unsigned-32]))
-(define listproperties-opcode 21)
+    [value-err unsigned-32]
+    (define listproperties-opcode 21)
 (define-ftype listproperties
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [window unsigned-32]))
 (define-ftype listproperties-reply
   (struct
+    [pad0 (array 1 unsigned-8)]
     [atoms_len unsigned-16]
-    [pad (array 22 unsigned-8)]))
-(define setselectionowner-opcode 22)
+    [pad1 (array 22 unsigned-8)]
+    (define setselectionowner-opcode 22)
 (define-ftype setselectionowner
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [owner unsigned-32]
     [selection unsigned-32]
-    [time timestamp]))
-[atom-err unsigned-32]))
-(define getselectionowner-opcode 23)
+    [time timestamp]
+    [atom-err unsigned-32]
+    (define getselectionowner-opcode 23)
 (define-ftype getselectionowner
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [selection unsigned-32]))
 (define-ftype getselectionowner-reply
   (struct
-    [owner unsigned-32]))
-[atom-err unsigned-32]))
-(define convertselection-opcode 24)
+    [pad0 (array 1 unsigned-8)]
+    [owner unsigned-32]
+    [atom-err unsigned-32]
+    (define convertselection-opcode 24)
 (define-ftype convertselection
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [requestor unsigned-32]
     [selection unsigned-32]
     [target unsigned-32]
@@ -713,10 +721,10 @@
   (struct
     [propagate boolean]
     [destination unsigned-32]
-    [event_mask-mask unsigned-32]))
-[window-err unsigned-32]
-    [value-err unsigned-32]))
-
+    [event_mask-mask unsigned-32]
+    [window-err unsigned-32]
+    [value-err unsigned-32]
+    
 (define grabmode (enum '((grabmode-sync 0)
     (grabmode-async 1))))
 
@@ -740,14 +748,15 @@
     [time timestamp]))
 (define-ftype grabpointer-reply
   (struct
+    [status-enum unsigned-8]
     [value-err unsigned-32]
-    [window-err unsigned-32]))
-(define ungrabpointer-opcode 27)
+    [window-err unsigned-32]
+    (define ungrabpointer-opcode 27)
 (define-ftype ungrabpointer
   (struct
-    [pad (array 1 unsigned-8)]
-    [time timestamp]))
-
+    [pad0 (array 1 unsigned-8)]
+    [time timestamp]
+    
 (define buttonindex (enum '((buttonindex-any 0)
     (buttonindex-1 1)
     (buttonindex-2 2)
@@ -765,9 +774,9 @@
     [confine_to unsigned-32]
     [cursor unsigned-32]
     [button-enum unsigned-8]
-    [pad (array 1 unsigned-8)]
-    [modifiers-mask unsigned-16]))
-[access-err unsigned-32]
+    [pad0 (array 1 unsigned-8)]
+    [modifiers-mask unsigned-16]
+    [access-err unsigned-32]
     [value-err unsigned-32]
     [cursor-err unsigned-32]
     [window-err unsigned-32]))
@@ -777,15 +786,15 @@
     [button-enum unsigned-8]
     [grab_window unsigned-32]
     [modifiers-mask unsigned-16]
-    [pad (array 2 unsigned-8)]))
+    [pad0 (array 2 unsigned-8)]))
 (define changeactivepointergrab-opcode 30)
 (define-ftype changeactivepointergrab
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [cursor unsigned-32]
     [time timestamp]
     [event_mask-mask unsigned-16]
-    [pad (array 2 unsigned-8)]))
+    [pad1 (array 2 unsigned-8)]))
 (define grabkeyboard-opcode 31)
 (define-ftype grabkeyboard
   (struct
@@ -794,15 +803,16 @@
     [time timestamp]
     [pointer_mode-enum unsigned-8]
     [keyboard_mode-enum unsigned-8]
-    [pad (array 2 unsigned-8)]))
+    [pad0 (array 2 unsigned-8)]))
 (define-ftype grabkeyboard-reply
   (struct
+    [status-enum unsigned-8]
     [value-err unsigned-32]
-    [window-err unsigned-32]))
-(define ungrabkeyboard-opcode 32)
+    [window-err unsigned-32]
+    (define ungrabkeyboard-opcode 32)
 (define-ftype ungrabkeyboard
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [time timestamp]))
 
 (define grab (enum '((grab-any 0))))
@@ -815,20 +825,20 @@
     [key keycode]
     [pointer_mode-enum unsigned-8]
     [keyboard_mode-enum unsigned-8]
-    [pad (array 3 unsigned-8)]))
-[access-err unsigned-32]
+    [pad0 (array 3 unsigned-8)]
+    [access-err unsigned-32]
     [value-err unsigned-32]
-    [window-err unsigned-32]))
-(define ungrabkey-opcode 34)
+    [window-err unsigned-32]
+    (define ungrabkey-opcode 34)
 (define-ftype ungrabkey
   (struct
     [key keycode]
     [grab_window unsigned-32]
     [modifiers-mask unsigned-16]
-    [pad (array 2 unsigned-8)]))
-[window-err unsigned-32]
-    [value-err unsigned-32]))
-
+    [pad0 (array 2 unsigned-8)]
+    [window-err unsigned-32]
+    [value-err unsigned-32]
+    
 (define allow (enum '((allow-asyncpointer 0)
     (allow-syncpointer 1)
     (allow-replaypointer 2)
@@ -841,8 +851,8 @@
 (define-ftype allowevents
   (struct
     [mode-enum unsigned-8]
-    [time timestamp]))
-[value-err unsigned-32]))
+    [time timestamp]
+    [value-err unsigned-32]))
 (define grabserver-opcode 36)
 (define-ftype grabserver
   (struct
@@ -852,10 +862,11 @@
     (define querypointer-opcode 38)
 (define-ftype querypointer
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [window unsigned-32]))
 (define-ftype querypointer-reply
   (struct
+    [same_screen boolean]
     [root unsigned-32]
     [child unsigned-32]
     [root_x integer-16]
@@ -863,8 +874,8 @@
     [win_x integer-16]
     [win_y integer-16]
     [mask-mask unsigned-16]
-    [pad (array 2 unsigned-8)]))
-[window-err unsigned-32]))
+    [pad0 (array 2 unsigned-8)]
+    [window-err unsigned-32]))
 (define-ftype timecoord
   (struct
     [time timestamp]
@@ -873,31 +884,33 @@
 (define getmotionevents-opcode 39)
 (define-ftype getmotionevents
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [window unsigned-32]
     [start timestamp]
     [stop timestamp]))
 (define-ftype getmotionevents-reply
   (struct
+    [pad0 (array 1 unsigned-8)]
     [events_len unsigned-32]
-    [pad (array 20 unsigned-8)]))
-(define translatecoordinates-opcode 40)
+    [pad1 (array 20 unsigned-8)]
+    (define translatecoordinates-opcode 40)
 (define-ftype translatecoordinates
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [src_window unsigned-32]
     [dst_window unsigned-32]
     [src_x integer-16]
     [src_y integer-16]))
 (define-ftype translatecoordinates-reply
   (struct
+    [same_screen boolean]
     [child unsigned-32]
     [dst_x integer-16]
     [dst_y integer-16]))
 (define warppointer-opcode 41)
 (define-ftype warppointer
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [src_window unsigned-32]
     [dst_window unsigned-32]
     [src_x integer-16]
@@ -905,9 +918,9 @@
     [src_width unsigned-16]
     [src_height unsigned-16]
     [dst_x integer-16]
-    [dst_y integer-16]))
-[window-err unsigned-32]))
-
+    [dst_y integer-16]
+    [window-err unsigned-32]
+    
 (define inputfocus (enum '((inputfocus-none 0)
     (inputfocus-pointerroot 1)
     (inputfocus-parent 2)
@@ -917,27 +930,29 @@
   (struct
     [revert_to-enum unsigned-8]
     [focus unsigned-32]
-    [time timestamp]))
-[window-err unsigned-32]
+    [time timestamp]
+    [window-err unsigned-32]
     [match-err unsigned-32]
-    [value-err unsigned-32]))
-(define-ftype getinputfocus-reply
+    [value-err unsigned-32]
+    (define-ftype getinputfocus-reply
   (struct
+    [revert_to-enum unsigned-8]
     [focus unsigned-32]))
 (define-ftype querykeymap-reply
   (struct
+    [pad0 (array 1 unsigned-8)]
     (define openfont-opcode 45)
 (define-ftype openfont
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [fid unsigned-32]
     [name_len unsigned-16]
-    [pad (array 2 unsigned-8)]))
-[name-err unsigned-32]))
-(define closefont-opcode 46)
+    [pad1 (array 2 unsigned-8)]
+    [name-err unsigned-32]
+    (define closefont-opcode 46)
 (define-ftype closefont
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [font unsigned-32]))
 
 (define fontdraw (enum '((fontdraw-lefttoright 0)
@@ -957,14 +972,15 @@
 (define queryfont-opcode 47)
 (define-ftype queryfont
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [font unsigned-32]))
 (define-ftype queryfont-reply
   (struct
+    [pad0 (array 1 unsigned-8)]
     [min_bounds charinfo]
-    [pad (array 4 unsigned-8)]
+    [pad1 (array 4 unsigned-8)]
     [max_bounds charinfo]
-    [pad (array 4 unsigned-8)]
+    [pad2 (array 4 unsigned-8)]
     [min_char_or_byte2 unsigned-16]
     [max_char_or_byte2 unsigned-16]
     [default_char unsigned-16]
@@ -975,48 +991,51 @@
     [all_chars_exist boolean]
     [font_ascent integer-16]
     [font_descent integer-16]
-    [char_infos_len unsigned-32]))
-(define querytextextents-opcode 48)
+    [char_infos_len unsigned-32]
+    (define querytextextents-opcode 48)
 (define-ftype querytextextents
   (struct
-    [odd_length boolean]))
-[font unsigned-32]))
-(define-ftype querytextextents-reply
+    [odd_length boolean]
+    [font unsigned-32]
+    (define-ftype querytextextents-reply
   (struct
+    [draw_direction-enum unsigned-8]
     [font_ascent integer-16]
     [font_descent integer-16]
     [overall_ascent integer-16]
     [overall_descent integer-16]
     [overall_width int32]
     [overall_left int32]
-    [overall_right int32]))
-[gcontext-err unsigned-32]
+    [overall_right int32]
+    [gcontext-err unsigned-32]
     [font-err unsigned-32]))
 (define-ftype str
   (struct
-    [name_len unsigned-8]))
-(define listfonts-opcode 49)
+    [name_len unsigned-8]
+    (define listfonts-opcode 49)
 (define-ftype listfonts
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [max_names unsigned-16]
-    [pattern_len unsigned-16]))
-(define-ftype listfonts-reply
+    [pattern_len unsigned-16]
+    (define-ftype listfonts-reply
   (struct
+    [pad0 (array 1 unsigned-8)]
     [names_len unsigned-16]
-    [pad (array 22 unsigned-8)]))
-(define listfontswithinfo-opcode 50)
+    [pad1 (array 22 unsigned-8)]
+    (define listfontswithinfo-opcode 50)
 (define-ftype listfontswithinfo
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [max_names unsigned-16]
-    [pattern_len unsigned-16]))
-(define-ftype listfontswithinfo-reply
+    [pattern_len unsigned-16]
+    (define-ftype listfontswithinfo-reply
   (struct
+    [name_len unsigned-8]
     [min_bounds charinfo]
-    [pad (array 4 unsigned-8)]
+    [pad0 (array 4 unsigned-8)]
     [max_bounds charinfo]
-    [pad (array 4 unsigned-8)]
+    [pad1 (array 4 unsigned-8)]
     [min_char_or_byte2 unsigned-16]
     [max_char_or_byte2 unsigned-16]
     [default_char unsigned-16]
@@ -1027,34 +1046,35 @@
     [all_chars_exist boolean]
     [font_ascent integer-16]
     [font_descent integer-16]
-    [replies_hint unsigned-32]))
-(define setfontpath-opcode 51)
+    [replies_hint unsigned-32]
+    (define setfontpath-opcode 51)
 (define-ftype setfontpath
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [font_qty unsigned-16]
-    [pad (array 2 unsigned-8)]))
-(define-ftype getfontpath-reply
+    [pad1 (array 2 unsigned-8)]
+    (define-ftype getfontpath-reply
   (struct
+    [pad0 (array 1 unsigned-8)]
     [path_len unsigned-16]
-    [pad (array 22 unsigned-8)]))
-(define createpixmap-opcode 53)
+    [pad1 (array 22 unsigned-8)]
+    (define createpixmap-opcode 53)
 (define-ftype createpixmap
   (struct
     [depth unsigned-8]
     [pid unsigned-32]
     [drawable unsigned-32]
     [width unsigned-16]
-    [height unsigned-16]))
-[value-err unsigned-32]
+    [height unsigned-16]
+    [value-err unsigned-32]
     [drawable-err unsigned-32]
-    [alloc-err unsigned-32]))
-(define freepixmap-opcode 54)
+    [alloc-err unsigned-32]
+    (define freepixmap-opcode 54)
 (define-ftype freepixmap
   (struct
-    [pad (array 1 unsigned-8)]
-    [pixmap unsigned-32]))
-[pixmap-err unsigned-32]))
+    [pad0 (array 1 unsigned-8)]
+    [pixmap unsigned-32]
+    [pixmap-err unsigned-32]))
 
 (define gc (enum '((gc-function 1)
     (gc-planemask 2)
@@ -1126,7 +1146,7 @@
 (define creategc-opcode 55)
 (define-ftype creategc
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [cid unsigned-32]
     [drawable unsigned-32]
     [value_mask-mask unsigned-32]))
@@ -1177,17 +1197,17 @@
     [DashList unsigned-32]
     [dashes unsigned-32]
     [ArcMode unsigned-32]
-    [arc_mode-enum unsigned-32]))
-[drawable-err unsigned-32]
+    [arc_mode-enum unsigned-32]
+    [drawable-err unsigned-32]
     [match-err unsigned-32]
     [font-err unsigned-32]
     [pixmap-err unsigned-32]
     [value-err unsigned-32]
-    [alloc-err unsigned-32]))
-(define changegc-opcode 56)
+    [alloc-err unsigned-32]
+    (define changegc-opcode 56)
 (define-ftype changegc
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [gc unsigned-32]
     [value_mask-mask unsigned-32]))
 (define-ftype value_list
@@ -1237,8 +1257,8 @@
     [DashList unsigned-32]
     [dashes unsigned-32]
     [ArcMode unsigned-32]
-    [arc_mode-enum unsigned-32]))
-[font-err unsigned-32]
+    [arc_mode-enum unsigned-32]
+    [font-err unsigned-32]
     [gcontext-err unsigned-32]
     [match-err unsigned-32]
     [pixmap-err unsigned-32]
@@ -1247,18 +1267,18 @@
 (define copygc-opcode 57)
 (define-ftype copygc
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [src_gc unsigned-32]
     [dst_gc unsigned-32]
     [value_mask-mask unsigned-32]))
 (define setdashes-opcode 58)
 (define-ftype setdashes
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [gc unsigned-32]
     [dash_offset unsigned-16]
-    [dashes_len unsigned-16]))
-
+    [dashes_len unsigned-16]
+    
 (define clipordering (enum '((clipordering-unsorted 0)
     (clipordering-ysorted 1)
     (clipordering-yxsorted 2)
@@ -1269,13 +1289,13 @@
     [ordering-enum unsigned-8]
     [gc unsigned-32]
     [clip_x_origin integer-16]
-    [clip_y_origin integer-16]))
-(define freegc-opcode 60)
+    [clip_y_origin integer-16]
+    (define freegc-opcode 60)
 (define-ftype freegc
   (struct
-    [pad (array 1 unsigned-8)]
-    [gc unsigned-32]))
-[gcontext-err unsigned-32]))
+    [pad0 (array 1 unsigned-8)]
+    [gc unsigned-32]
+    [gcontext-err unsigned-32]))
 (define cleararea-opcode 61)
 (define-ftype cleararea
   (struct
@@ -1288,7 +1308,7 @@
 (define copyarea-opcode 62)
 (define-ftype copyarea
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [src_drawable unsigned-32]
     [dst_drawable unsigned-32]
     [gc unsigned-32]
@@ -1297,14 +1317,14 @@
     [dst_x integer-16]
     [dst_y integer-16]
     [width unsigned-16]
-    [height unsigned-16]))
-[drawable-err unsigned-32]
+    [height unsigned-16]
+    [drawable-err unsigned-32]
     [gcontext-err unsigned-32]
     [match-err unsigned-32]))
 (define copyplane-opcode 63)
 (define-ftype copyplane
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [src_drawable unsigned-32]
     [dst_drawable unsigned-32]
     [gc unsigned-32]
@@ -1323,14 +1343,14 @@
   (struct
     [coordinate_mode-enum unsigned-8]
     [drawable unsigned-32]
-    [gc unsigned-32]))
-(define polyline-opcode 65)
+    [gc unsigned-32]
+    (define polyline-opcode 65)
 (define-ftype polyline
   (struct
     [coordinate_mode-enum unsigned-8]
     [drawable unsigned-32]
-    [gc unsigned-32]))
-[drawable-err unsigned-32]
+    [gc unsigned-32]
+    [drawable-err unsigned-32]
     [gcontext-err unsigned-32]
     [match-err unsigned-32]
     [value-err unsigned-32]))
@@ -1343,53 +1363,53 @@
 (define polysegment-opcode 66)
 (define-ftype polysegment
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [drawable unsigned-32]
-    [gc unsigned-32]))
-[drawable-err unsigned-32]
+    [gc unsigned-32]
+    [drawable-err unsigned-32]
     [gcontext-err unsigned-32]
     [match-err unsigned-32]))
 (define polyrectangle-opcode 67)
 (define-ftype polyrectangle
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [drawable unsigned-32]
-    [gc unsigned-32]))
-(define polyarc-opcode 68)
+    [gc unsigned-32]
+    (define polyarc-opcode 68)
 (define-ftype polyarc
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [drawable unsigned-32]
-    [gc unsigned-32]))
-
+    [gc unsigned-32]
+    
 (define polyshape (enum '((polyshape-complex 0)
     (polyshape-nonconvex 1)
     (polyshape-convex 2))))
 (define fillpoly-opcode 69)
 (define-ftype fillpoly
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [drawable unsigned-32]
     [gc unsigned-32]
     [shape-enum unsigned-8]
     [coordinate_mode-enum unsigned-8]
-    [pad (array 2 unsigned-8)]))
-(define polyfillrectangle-opcode 70)
+    [pad1 (array 2 unsigned-8)]
+    (define polyfillrectangle-opcode 70)
 (define-ftype polyfillrectangle
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [drawable unsigned-32]
-    [gc unsigned-32]))
-[drawable-err unsigned-32]
+    [gc unsigned-32]
+    [drawable-err unsigned-32]
     [gcontext-err unsigned-32]
     [match-err unsigned-32]))
 (define polyfillarc-opcode 71)
 (define-ftype polyfillarc
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [drawable unsigned-32]
-    [gc unsigned-32]))
-
+    [gc unsigned-32]
+    
 (define imageformat (enum '((imageformat-xybitmap 0)
     (imageformat-xypixmap 1)
     (imageformat-zpixmap 2))))
@@ -1405,8 +1425,8 @@
     [dst_y integer-16]
     [left_pad unsigned-8]
     [depth unsigned-8]
-    [pad (array 2 unsigned-8)]))
-(define getimage-opcode 73)
+    [pad0 (array 2 unsigned-8)]
+    (define getimage-opcode 73)
 (define-ftype getimage
   (struct
     [format-enum unsigned-8]
@@ -1418,47 +1438,48 @@
     [plane_mask unsigned-32]))
 (define-ftype getimage-reply
   (struct
+    [depth unsigned-8]
     [visual unsigned-32]
-    [pad (array 20 unsigned-8)]))
-(define polytext8-opcode 74)
+    [pad0 (array 20 unsigned-8)]
+    (define polytext8-opcode 74)
 (define-ftype polytext8
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [drawable unsigned-32]
     [gc unsigned-32]
     [x integer-16]
-    [y integer-16]))
-(define polytext16-opcode 75)
+    [y integer-16]
+    (define polytext16-opcode 75)
 (define-ftype polytext16
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [drawable unsigned-32]
     [gc unsigned-32]
     [x integer-16]
-    [y integer-16]))
-(define imagetext8-opcode 76)
+    [y integer-16]
+    (define imagetext8-opcode 76)
 (define-ftype imagetext8
   (struct
     [string_len unsigned-8]
     [drawable unsigned-32]
     [gc unsigned-32]
     [x integer-16]
-    [y integer-16]))
-[drawable-err unsigned-32]
+    [y integer-16]
+    [drawable-err unsigned-32]
     [gcontext-err unsigned-32]
-    [match-err unsigned-32]))
-(define imagetext16-opcode 77)
+    [match-err unsigned-32]
+    (define imagetext16-opcode 77)
 (define-ftype imagetext16
   (struct
     [string_len unsigned-8]
     [drawable unsigned-32]
     [gc unsigned-32]
     [x integer-16]
-    [y integer-16]))
-[drawable-err unsigned-32]
+    [y integer-16]
+    [drawable-err unsigned-32]
     [gcontext-err unsigned-32]
-    [match-err unsigned-32]))
-
+    [match-err unsigned-32]
+    
 (define colormapalloc (enum '((colormapalloc-none 0)
     (colormapalloc-all 1))))
 (define createcolormap-opcode 78)
@@ -1471,59 +1492,62 @@
 (define freecolormap-opcode 79)
 (define-ftype freecolormap
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [cmap unsigned-32]))
 (define copycolormapandfree-opcode 80)
 (define-ftype copycolormapandfree
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [mid unsigned-32]
     [src_cmap unsigned-32]))
 (define installcolormap-opcode 81)
 (define-ftype installcolormap
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [cmap unsigned-32]))
 (define uninstallcolormap-opcode 82)
 (define-ftype uninstallcolormap
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [cmap unsigned-32]))
 (define listinstalledcolormaps-opcode 83)
 (define-ftype listinstalledcolormaps
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [window unsigned-32]))
 (define-ftype listinstalledcolormaps-reply
   (struct
+    [pad0 (array 1 unsigned-8)]
     [cmaps_len unsigned-16]
-    [pad (array 22 unsigned-8)]))
-(define alloccolor-opcode 84)
+    [pad1 (array 22 unsigned-8)]
+    (define alloccolor-opcode 84)
 (define-ftype alloccolor
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [cmap unsigned-32]
     [red unsigned-16]
     [green unsigned-16]
     [blue unsigned-16]
-    [pad (array 2 unsigned-8)]))
+    [pad1 (array 2 unsigned-8)]))
 (define-ftype alloccolor-reply
   (struct
+    [pad0 (array 1 unsigned-8)]
     [red unsigned-16]
     [green unsigned-16]
     [blue unsigned-16]
-    [pad (array 2 unsigned-8)]
-    [pixel unsigned-32]))
-[colormap-err unsigned-32]))
+    [pad1 (array 2 unsigned-8)]
+    [pixel unsigned-32]
+    [colormap-err unsigned-32]))
 (define allocnamedcolor-opcode 85)
 (define-ftype allocnamedcolor
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [cmap unsigned-32]
     [name_len unsigned-16]
-    [pad (array 2 unsigned-8)]))
-(define-ftype allocnamedcolor-reply
+    [pad1 (array 2 unsigned-8)]
+    (define-ftype allocnamedcolor-reply
   (struct
+    [pad0 (array 1 unsigned-8)]
     [pixel unsigned-32]
     [exact_red unsigned-16]
     [exact_green unsigned-16]
@@ -1540,10 +1564,11 @@
     [planes unsigned-16]))
 (define-ftype alloccolorcells-reply
   (struct
+    [pad0 (array 1 unsigned-8)]
     [pixels_len unsigned-16]
     [masks_len unsigned-16]
-    [pad (array 20 unsigned-8)]))
-(define alloccolorplanes-opcode 87)
+    [pad1 (array 20 unsigned-8)]
+    (define alloccolorplanes-opcode 87)
 (define-ftype alloccolorplanes
   (struct
     [contiguous boolean]
@@ -1554,19 +1579,20 @@
     [blues unsigned-16]))
 (define-ftype alloccolorplanes-reply
   (struct
+    [pad0 (array 1 unsigned-8)]
     [pixels_len unsigned-16]
-    [pad (array 2 unsigned-8)]
+    [pad1 (array 2 unsigned-8)]
     [red_mask unsigned-32]
     [green_mask unsigned-32]
     [blue_mask unsigned-32]
-    [pad (array 8 unsigned-8)]))
-(define freecolors-opcode 88)
+    [pad2 (array 8 unsigned-8)]
+    (define freecolors-opcode 88)
 (define-ftype freecolors
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [cmap unsigned-32]
-    [plane_mask unsigned-32]))
-
+    [plane_mask unsigned-32]
+    
 (define colorflag (enum '((colorflag-red 1)
     (colorflag-green 2)
     (colorflag-blue 4))))
@@ -1577,44 +1603,46 @@
     [green unsigned-16]
     [blue unsigned-16]
     [flags-mask unsigned-8]
-    [pad (array 1 unsigned-8)]))
+    [pad0 (array 1 unsigned-8)]))
 (define storecolors-opcode 89)
 (define-ftype storecolors
   (struct
-    [pad (array 1 unsigned-8)]
-    [cmap unsigned-32]))
-(define storenamedcolor-opcode 90)
+    [pad0 (array 1 unsigned-8)]
+    [cmap unsigned-32]
+    (define storenamedcolor-opcode 90)
 (define-ftype storenamedcolor
   (struct
     [flags-mask unsigned-8]
     [cmap unsigned-32]
     [pixel unsigned-32]
     [name_len unsigned-16]
-    [pad (array 2 unsigned-8)]))
-(define-ftype rgb
+    [pad0 (array 2 unsigned-8)]
+    (define-ftype rgb
   (struct
     [red unsigned-16]
     [green unsigned-16]
     [blue unsigned-16]
-    [pad (array 2 unsigned-8)]))
+    [pad0 (array 2 unsigned-8)]))
 (define querycolors-opcode 91)
 (define-ftype querycolors
   (struct
-    [pad (array 1 unsigned-8)]
-    [cmap unsigned-32]))
-(define-ftype querycolors-reply
+    [pad0 (array 1 unsigned-8)]
+    [cmap unsigned-32]
+    (define-ftype querycolors-reply
   (struct
+    [pad0 (array 1 unsigned-8)]
     [colors_len unsigned-16]
-    [pad (array 22 unsigned-8)]))
-(define lookupcolor-opcode 92)
+    [pad1 (array 22 unsigned-8)]
+    (define lookupcolor-opcode 92)
 (define-ftype lookupcolor
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [cmap unsigned-32]
     [name_len unsigned-16]
-    [pad (array 2 unsigned-8)]))
-(define-ftype lookupcolor-reply
+    [pad1 (array 2 unsigned-8)]
+    (define-ftype lookupcolor-reply
   (struct
+    [pad0 (array 1 unsigned-8)]
     [exact_red unsigned-16]
     [exact_green unsigned-16]
     [exact_blue unsigned-16]
@@ -1626,7 +1654,7 @@
 (define createcursor-opcode 93)
 (define-ftype createcursor
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [cid unsigned-32]
     [source unsigned-32]
     [mask unsigned-32]
@@ -1643,7 +1671,7 @@
 (define createglyphcursor-opcode 94)
 (define-ftype createglyphcursor
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [cid unsigned-32]
     [source_font unsigned-32]
     [mask_font unsigned-32]
@@ -1654,20 +1682,20 @@
     [fore_blue unsigned-16]
     [back_red unsigned-16]
     [back_green unsigned-16]
-    [back_blue unsigned-16]))
-[alloc-err unsigned-32]
+    [back_blue unsigned-16]
+    [alloc-err unsigned-32]
     [font-err unsigned-32]
     [value-err unsigned-32]))
 (define freecursor-opcode 95)
 (define-ftype freecursor
   (struct
-    [pad (array 1 unsigned-8)]
-    [cursor unsigned-32]))
-[cursor-err unsigned-32]))
+    [pad0 (array 1 unsigned-8)]
+    [cursor unsigned-32]
+    [cursor-err unsigned-32]))
 (define recolorcursor-opcode 96)
 (define-ftype recolorcursor
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [cursor unsigned-32]
     [fore_red unsigned-16]
     [fore_green unsigned-16]
@@ -1688,40 +1716,44 @@
     [height unsigned-16]))
 (define-ftype querybestsize-reply
   (struct
+    [pad0 (array 1 unsigned-8)]
     [width unsigned-16]
     [height unsigned-16]))
 (define queryextension-opcode 98)
 (define-ftype queryextension
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [name_len unsigned-16]
-    [pad (array 2 unsigned-8)]))
-(define-ftype queryextension-reply
+    [pad1 (array 2 unsigned-8)]
+    (define-ftype queryextension-reply
   (struct
+    [pad0 (array 1 unsigned-8)]
     [present boolean]
     [major_opcode unsigned-8]
     [first_event unsigned-8]
-    [first_error unsigned-8]))
-(define-ftype listextensions-reply
+    [first_error unsigned-8]
+    (define-ftype listextensions-reply
   (struct
-    [pad (array 24 unsigned-8)]))
-(define changekeyboardmapping-opcode 100)
+    [names_len unsigned-8]
+    [pad0 (array 24 unsigned-8)]
+    (define changekeyboardmapping-opcode 100)
 (define-ftype changekeyboardmapping
   (struct
     [keycode_count unsigned-8]
     [first_keycode keycode]
     [keysyms_per_keycode unsigned-8]
-    [pad (array 2 unsigned-8)]))
-(define getkeyboardmapping-opcode 101)
+    [pad0 (array 2 unsigned-8)]
+    (define getkeyboardmapping-opcode 101)
 (define-ftype getkeyboardmapping
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [first_keycode keycode]
     [count unsigned-8]))
 (define-ftype getkeyboardmapping-reply
   (struct
-    [pad (array 24 unsigned-8)]))
-
+    [keysyms_per_keycode unsigned-8]
+    [pad0 (array 24 unsigned-8)]
+    
 (define kb (enum '((kb-keyclickpercent 1)
     (kb-bellpercent 2)
     (kb-bellpitch 4)
@@ -1740,7 +1772,7 @@
 (define changekeyboardcontrol-opcode 102)
 (define-ftype changekeyboardcontrol
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [value_mask-mask unsigned-32]))
 (define-ftype value_list
   (struct
@@ -1762,20 +1794,21 @@
     [auto_repeat_mode-enum unsigned-32]))
 (define-ftype getkeyboardcontrol-reply
   (struct
+    [global_auto_repeat-enum unsigned-8]
     [led_mask unsigned-32]
     [key_click_percent unsigned-8]
     [bell_percent unsigned-8]
     [bell_pitch unsigned-16]
     [bell_duration unsigned-16]
-    [pad (array 2 unsigned-8)]))
-(define bell-opcode 104)
+    [pad0 (array 2 unsigned-8)]
+    (define bell-opcode 104)
 (define-ftype bell
   (struct
     [percent int8]))
 (define changepointercontrol-opcode 105)
 (define-ftype changepointercontrol
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [acceleration_numerator integer-16]
     [acceleration_denominator integer-16]
     [threshold integer-16]
@@ -1783,10 +1816,11 @@
     [do_threshold boolean]))
 (define-ftype getpointercontrol-reply
   (struct
+    [pad0 (array 1 unsigned-8)]
     [acceleration_numerator unsigned-16]
     [acceleration_denominator unsigned-16]
     [threshold unsigned-16]
-    [pad (array 18 unsigned-8)]))
+    [pad1 (array 18 unsigned-8)]))
 
 (define blanking (enum '((blanking-notpreferred 0)
     (blanking-preferred 1)
@@ -1798,18 +1832,19 @@
 (define setscreensaver-opcode 107)
 (define-ftype setscreensaver
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [timeout integer-16]
     [interval integer-16]
     [prefer_blanking-enum unsigned-8]
     [allow_exposures-enum unsigned-8]))
 (define-ftype getscreensaver-reply
   (struct
+    [pad0 (array 1 unsigned-8)]
     [timeout unsigned-16]
     [interval unsigned-16]
     [prefer_blanking-enum unsigned-8]
     [allow_exposures-enum unsigned-8]
-    [pad (array 18 unsigned-8)]))
+    [pad1 (array 18 unsigned-8)]))
 
 (define hostmode (enum '((hostmode-insert 0)
     (hostmode-delete 1))))
@@ -1824,19 +1859,20 @@
   (struct
     [mode-enum unsigned-8]
     [family-enum unsigned-8]
-    [pad (array 1 unsigned-8)]
-    [address_len unsigned-16]))
-(define-ftype host
+    [pad0 (array 1 unsigned-8)]
+    [address_len unsigned-16]
+    (define-ftype host
   (struct
     [family-enum unsigned-8]
-    [pad (array 1 unsigned-8)]
-    [address_len unsigned-16]))
-[pad (array 4 unsigned-8)]))
+    [pad0 (array 1 unsigned-8)]
+    [address_len unsigned-16]
+    [pad1 (array 4 unsigned-8)]))
 (define-ftype listhosts-reply
   (struct
+    [mode-enum unsigned-8]
     [hosts_len unsigned-16]
-    [pad (array 22 unsigned-8)]))
-
+    [pad0 (array 22 unsigned-8)]
+    
 (define accesscontrol (enum '((accesscontrol-disable 0)
     (accesscontrol-enable 1))))
 (define setaccesscontrol-opcode 111)
@@ -1856,17 +1892,17 @@
 (define killclient-opcode 113)
 (define-ftype killclient
   (struct
-    [pad (array 1 unsigned-8)]
-    [resource unsigned-32]))
-[value-err unsigned-32]))
-(define rotateproperties-opcode 114)
+    [pad0 (array 1 unsigned-8)]
+    [resource unsigned-32]
+    [value-err unsigned-32]
+    (define rotateproperties-opcode 114)
 (define-ftype rotateproperties
   (struct
-    [pad (array 1 unsigned-8)]
+    [pad0 (array 1 unsigned-8)]
     [window unsigned-32]
     [atoms_len unsigned-16]
-    [delta integer-16]))
-
+    [delta integer-16]
+    
 (define screensaver (enum '((screensaver-reset 0)
     (screensaver-active 1))))
 (define forcescreensaver-opcode 115)
@@ -1880,13 +1916,15 @@
 (define setpointermapping-opcode 116)
 (define-ftype setpointermapping
   (struct
-    [map_len unsigned-8]))
-(define-ftype setpointermapping-reply
+    [map_len unsigned-8]
+    (define-ftype setpointermapping-reply
   (struct
-    (define-ftype getpointermapping-reply
+    [status-enum unsigned-8]))
+(define-ftype getpointermapping-reply
   (struct
-    [pad (array 24 unsigned-8)]))
-
+    [map_len unsigned-8]
+    [pad0 (array 24 unsigned-8)]
+    
 (define mapindex (enum '((mapindex-shift 0)
     (mapindex-lock 1)
     (mapindex-control 2)
@@ -1898,9 +1936,12 @@
 (define setmodifiermapping-opcode 118)
 (define-ftype setmodifiermapping
   (struct
-    [keycodes_per_modifier unsigned-8]))
-(define-ftype setmodifiermapping-reply
+    [keycodes_per_modifier unsigned-8]
+    (define-ftype setmodifiermapping-reply
   (struct
-    (define-ftype getmodifiermapping-reply
+    [status-enum unsigned-8]))
+(define-ftype getmodifiermapping-reply
   (struct
-    [pad (array 24 unsigned-8)]))
+    [keycodes_per_modifier unsigned-8]
+    [pad0 (array 24 unsigned-8)]
+    
