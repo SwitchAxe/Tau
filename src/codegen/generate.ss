@@ -15,7 +15,7 @@
 	   drawable bool32 timestap
 	   keysym keycode32 card32))
 
-(define uint8s '(byte card8 depth))
+(define uint8s '(byte card8 depth keycode))
 
 (define int16s '(int16))
 
@@ -53,9 +53,9 @@
       (list->code-aux port (cdr l) (cadr l) "" #f 0)]
      [(equal? (car current-node) 'request)
       (cond
-       [(member (caadr l) '(bitcase see example doc description list op brief))
+       [(member (caadr l) '(bitcase see example doc description list op brief fieldref))
 	;;truncate the next node in the list and append the current one instead
-	(list->code-aux port (append current-node (cddr l)) (caddr l) "" #f 0)]
+	(list->code-aux port (cons current-node (cddr l)) (current-node) "" #f 0)]
        [(equal? (caadr l) 'reply)
 	(list->code-aux port (cdr l) (cadr l) (cadr (assoc 'name (cdr current-node))) #t 0)]
        [else
@@ -94,8 +94,9 @@
 			    (cadr
 			     (assoc 'number (cdr current-node)))))
 			  (if (or (null? (cdr l))
-				  (let loop [(lc l)]
+				  (let loop [(lc (cdr l))]
 				    (cond
+				     [(null? lc) #t]
 				     [(member (caar lc)
 					      '(list op fieldref
 						     bitcase doc brief
@@ -206,13 +207,14 @@
               (if (or (null? (cdr l)) 
 		      (let loop [(lc (cdr l))]
 			(cond
+			 [(null? lc) #t]
 			 [(member (caar lc)
-				  '(list op fieldref
+				  '(list op fieldref value
 					 bitcase doc brief
 					 description see example))
 			  (loop (cdr lc))]
 			 [(member (caar lc)
-				  (append '(xidtype enum request reply) data-structures)) #t]
+				  (append '(xidtype enum request reply switch) data-structures)) #t]
 			 [else #f])))
 		  "))\n"
 		  "\n    ")))
@@ -224,14 +226,16 @@
 			       (if (or (null? (cdr l))
 				       (let loop [(lc (cdr l))]
 					 (cond
+					  [(null? lc) #t]
 					  [(member (caar lc)
-						   '(list op fieldref
+						   '(list op fieldref value
 							  bitcase doc brief
 							  description see example))
 					   (loop (cdr lc))]
 					  [(member (caar lc)
 						   (append
-						    '(xidtype enum request reply) data-structures)) #t]
+						    '(xidtype enum request reply switch)
+						    data-structures)) #t]
 					  [else #f])))
 				   "))\n"
 				   "\n    ")))
@@ -245,14 +249,16 @@
 			       (if (or (null? (cdr l))
 				       (let loop [(lc (cdr l))]
 					 (cond
+					  [(null? lc) #t]
 					  [(member (caar lc)
-						   '(list op fieldref
+						   '(list op fieldref value
 							  bitcase doc brief
 							  description see example))
 					   (loop (cdr lc))]
 					  [(member (caar lc)
 						   (append
-						    '(xidtype enum request reply) data-structures)) #t]
+						    '(xidtype enum request reply switch)
+						    data-structures)) #t]
 					  [else #f])))
 				   "))\n"
 				   "\n    ")))
@@ -264,14 +270,16 @@
 				 (if (or (null? (cdr l)) 
 					 (let loop [(lc (cdr l))]
 					   (cond
+					    [(null? lc) #t]
 					    [(member (caar lc)
-						     '(list op fieldref
+						     '(list op fieldref value
 							    bitcase doc brief
 							    description see example))
 					     (loop (cdr lc))]
 					    [(member (caar lc)
 						     (append
-						      '(xidtype enum request reply) data-structures)) #t]
+						      '(xidtype enum request reply switch)
+						      data-structures)) #t]
 					    [else #f])))
 				     "))\n"
 				     "\n    ")))
