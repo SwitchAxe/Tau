@@ -1,11 +1,10 @@
 ;;------------------------ENUMS!-----------------------------
-
-
-(define (alist? l)
+(define (alist? l) ;;alist == association list
   (cond
    [(null? l) #t]
    [(and (pair? (car l)) (symbol? (caar l))) (alist? (cdr l))]
    [else #f]))
+
 
 ;;Enum Element
 (define-record-type EE (fields sym value))
@@ -34,6 +33,7 @@
           (make-error)
           (make-message-condition
            "exception in 'enum': Can't make an enum with non-symbols!"))))]))
+
 
 (define (enum l)
   (enum-aux l 0))
