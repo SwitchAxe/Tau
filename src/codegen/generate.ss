@@ -12,6 +12,41 @@
         (loop (- n 1) (cdr xs)
               (cons (car xs) zs)))))
 
+
+;;DOC: TODO
+;; RETURNS A BOOLEAN
+;; #t -> newline must be inserted
+;; #f -> no newline
+(define (maybe-insert-newline lc tagl useless-tagl1 useless-tagl2 field-tagl)
+  (let loop [(lc lc)]
+   (cond
+    [(null? lc)
+     (set! l lc) ;;l is an external variable
+     #t]
+    [(null? (cdr lc))
+     (set! l (cdr lc))
+     #t]
+    [(member (caadr lc) useless-tagl1)
+     (loop (cdr lc))]
+    [(member (caadr lc) useless-tagl2)
+     (let inner [(lcc (cdr lc))]
+       (cond
+	[(null? lcc)
+	 (set! l lcc)
+	 #t]
+	[(null? (cdr lcc))
+	 (set! l (cdr lcc))
+	 #t]
+	[(member (caar lcc) tagl)
+	 (set! l lcc)
+	 #t]
+	[else
+	 (inner (cdr lcc))]))]
+    [(member (caadr lc) tagl) #t]
+    [(member (caadr lc) field-tagl) #f]
+    [else (loop (cdr lc))])))
+
+
 (define tx
   (make-transcoder (utf-8-codec) (eol-style lf) (error-handling-mode raise)))
 
@@ -26,10 +61,17 @@
 	   keysym keycode32 card32))
 
 (define uint8s '(byte card8 depth keycode char))
-
+(define int8s '(int8))
 (define int16s '(int16))
-
+(define int32s '(int32))
 (define uint16s '(card16))
+(define custom-types '()) ;;for structs and so on
+
+(define field-xml-tags '(field list error pad fieldexpr)) ;;for inserting newlines
+(define struct-xml-tags '(struct union xidunion
+				 request reply
+				 error enum
+				 xidtype switch event))
 
 ;;for turning XML tokens into valid chez scheme types.
 (define (safestring s)
@@ -65,6 +107,8 @@
 	   [(equal? dast 'xidunion) 'union]
 	   [(equal? dast 'switch) 'struct]
 	   [else dast]))))
+      (set! custom-types (cons (string->symbol (safestring (cadr (assoc 'name (cdr current-node)))))
+			       custom-types))
       (list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) "" #f 0 list-stack)]
      [(equal? (car current-node) 'request)
       (cond
@@ -80,8 +124,14 @@
 	    (put-string port (format "(define ~s-opcode ~s)\n"
 				     (string->symbol (safestring (cadr reqname)))
 				     (string->number (safestring (cadr opcode))))))
-	  (put-string port (format "(define-ftype ~s\n  (struct\n    "
-				   (string->symbol (safestring (cadr reqname)))))
+	  (if (member (string->symbol (safestring (cadr reqname))) '(grabserver ungrabserver))
+	      (put-string port (format (string-append "(define-ftype ~s\n  (struct\n    "
+						      "[major-opcode unsigned-8]\n    "
+						      "[pad0 unsigned-8]\n    "
+						      "[length unsigned-16]))")
+				       (string->symbol (safestring (cadr reqname)))))
+	      (put-string port (format "(define-ftype ~s\n  (struct\n    "
+				       (string->symbol (safestring (cadr reqname))))))
 	  (list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) (cadr reqname) #f 0 list-stack))])]
      [(equal? (car current-node) 'reply)
       (list->code-aux port l (car l) request-name #t 0 list-stack)]
@@ -99,35 +149,39 @@
 				   "\n    ")))
       (list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) request-name needs-reply? npad list-stack)]
      [(equal? (car current-node) 'event)
-      (put-string port (format "[~s ~s]~a"
-			  (string->symbol
-			   (safestring
-			    (cadr
-			     (assoc 'name (cdr current-node)))))
-			  (string->number
-			   (safestring
-			    (cadr
-			     (assoc 'number (cdr current-node)))))
-			  (if (or (null? (cdr l))
-				  (let loop [(lc (cdr l))]
-				    (cond
-				     [(null? lc) #t]
-				     [(member (caar lc)
-					      '(op fieldref
-						     bitcase doc brief
-						     description see example))
-				      (loop (cdr lc))]
-				     [(member (caar lc)
-					      (append '(xidtype enum reply) data-structures)) #t]
-				     [else #f])))
-			      "\n"
-			      "\n    ")))
+      (put-string port (format "(define ~s-number ~s)\n"
+			       (string->symbol
+				(safestring
+				 (cadr
+				  (assoc 'name (cdr current-node)))))
+			       (string->number
+				(safestring
+				 (cadr
+				  (assoc 'number (cdr current-node)))))))
+      (put-string port (format "(define-ftype ~s\n    (struct\n    "
+			       (string->symbol
+				(safestring
+				 (cadr
+				  (assoc 'name (cdr current-node)))))))
       (list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) request-name needs-reply? npad list-stack)]
      [(equal? (car current-node) 'typedef)
-      ;;we don't need to typedef anything since all our types are
-      ;;well-known before we start to generate the code
-      ;;(i looked them up and put them in lists accordingly)
-      ;;so we just skip the following element (an inner two-element list):
+      ;;<typedef oldname="oldtype" newname="newtype"> ->
+      ;;(typedef (oldname "oldtype") (newname "newtype"))
+      (let [(ot (string->symbol (safestring (cadr (assoc 'oldname (cdr current-node))))))
+	    (nt (string->symbol (safestring (cadr (assoc 'newname (cdr current-node))))))]
+	  (cond
+	   [(member ot uint8s)
+	    (set! uint8s (cons nt uint8s))]
+	   [(member ot uint16s)
+	    (set! uint16s (cons nt uint16s))]
+	   [(member ot uint32s)
+	    (set! uint32s (cons nt uint32s))]
+	   [(member ot int16s)
+	    (set! int16s (cons nt int16s))]
+	   [(member ot int32s)
+	    (set! int32s (cons nt int32s))]
+	   [(member ot int8s)
+	    (set! int8s (cons nt int8s))]))
       (list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) "" #f 0 list-stack)]
      [(equal? (car current-node) 'enum)
       (let [(enum-name (safestring (cadr (assoc 'name (cdr current-node)))))]
@@ -217,23 +271,17 @@
 		     [(member (string->symbol t) uint32s) "unsigned-32"]
 		     [(member (string->symbol t) uint8s) "unsigned-8"]
 		     [(equal? (string->symbol t) 'bool) "boolean"]
-		     [(equal? (string->symbol t) 'card16) "unsigned-16"]
-		     [(equal? (string->symbol t) 'int16) "integer-16"]
+		     [(member (string->symbol t) uint16s) "unsigned-16"]
+		     [(member (string->symbol t) int16s) "integer-16"]
+		     [(member (string->symbol t) int32s) "integer-32"]
+		     [(member (string->symbol t) int8s) "integer-8"]
 		     [else t]))))])
-              (if (or (null? (cdr l)) 
-		      (let loop [(lc (cdr l))]
-			(cond
-			 [(null? lc) #t]
-			 [(member (caar lc)
-				  '(op fieldref value
-				       bitcase doc brief
-				       description see example))
-			  (loop (cdr lc))]
-			 [(member (caar lc)
-				  (append '(xidtype enum request reply switch) data-structures)) #t]
-			 [else
-			  (printf "\n\n\n\n\n\nFOUND ~a\n\n\n\n\n\n\n" (take 4 lc))
-			  #f])))
+              (if (or (null? (cdr l)) (maybe-insert-newline
+				       l
+				       struct-xml-tags
+				       '(op fieldref value bitcase)
+				       '(description see example brief doc)
+				       field-xml-tags))
 		  "))\n"
 		  "\n    ")))
 	    (list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) request-name needs-reply? npad list-stack)))]
@@ -242,19 +290,12 @@
 			       (string->symbol (caddr current-node))
 			       'unsigned-32
 			       (if (or (null? (cdr l))
-				       (let loop [(lc (cdr l))]
-					 (cond
-					  [(null? lc) #t]
-					  [(member (caar lc)
-						   '(op fieldref value
-							bitcase doc brief
-							description see example))
-					   (loop (cdr lc))]
-					  [(member (caar lc)
-						   (append
-						    '(xidtype enum request reply switch)
-						    data-structures)) #t]
-					  [else #f])))
+				       (maybe-insert-newline
+					l
+					struct-xml-tags
+					'(op fieldref value bitcase)
+					'(description see example brief doc)
+					field-xml-tags))
 				   "))\n"
 				   "\n    ")))
       (list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) request-name needs-reply? npad list-stack)]
@@ -265,42 +306,27 @@
 			       npad
 			       (safestring (cadadr current-node))
 			       (if (or (null? (cdr l))
-				       (let loop [(lc (cdr l))]
-					 (cond
-					  [(null? lc) #t]
-					  [(member (caar lc)
-						   '(op fieldref value
-							bitcase doc brief
-							description see example))
-					   (loop (cdr lc))]
-					  [(member (caar lc)
-						   (append
-						    '(xidtype enum request reply switch)
-						    data-structures)) #t]
-					  [else #f])))
+				       (maybe-insert-newline
+					l
+					struct-xml-tags
+					'(op fieldref value bitcase)
+					'(description see example brief doc)
+				        field-xml-tags))
 				   "))\n"
 				   "\n    ")))
       (list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) request-name needs-reply? (add1 npad) list-stack)]
      [(equal? (car current-node) 'error)
       (let [(errt (assoc 'type (cdr current-node)))]
-	(put-string port (format "[~s-err unsigned-32]~a"
+	(put-string port (format "(define-ftype ~s-error\n  (struct\n  ~a))\n"
 				 (string->symbol (safestring (cadr errt)))
-				 (if (or (null? (cdr l)) 
-					 (let loop [(lc (cdr l))]
-					   (cond
-					    [(null? lc) #t]
-					    [(member (caar lc)
-						     '(op fieldref value
-							  bitcase doc brief
-							  description see example))
-					     (loop (cdr lc))]
-					    [(member (caar lc)
-						     (append
-						      '(xidtype enum request reply switch)
-						      data-structures)) #t]
-					    [else #f])))
-				     "))\n"
-				     "\n    ")))
+			         (string-append "[response-type unsigned-8]\n    "
+						"[error-code unsigned-8]\n    "
+						"[sequence unsigned-16]\n    "
+						"[bad-value unsigned-32]\n    "
+						"[minor-opcode unsigned-16]\n    "
+						"[major-opcode unsigned-8]\n    "
+						"[pad0 unsigned-8]")
+				       ))
 	(list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) request-name needs-reply? npad list-stack))]
      [(equal? (car current-node) 'list)
       ;;this is tricky, it may or may not be useful,
@@ -329,23 +355,19 @@
 				      [(member t uint8s) "(* unsigned-8)"]
 				      [(member t uint32s) "(* unsigned-32)"]
 				      [(member t int16s) "(* integer-16)"]
+				      [(member t uint16s) "(* unsigned-16)"]
+				      [(member t int32s) "(* integer-32)"]
+				      [(member t int8s) "(* integer-8)"]
 				      [(equal? t 'bool) "(* boolean)"]
+				      [(equal? t 'void) "void*"]
 				      [else (format "(* ~a)" t)]))))
-				 (if (or (null? (cdr l)) 
-					 (let loop [(lc (cdr l))]
-					   (display (format "ma ciao!! ~a\n" lc))
-					   (cond
-					    [(null? lc) #t]
-					    [(member (caar lc)
-						     '(op fieldref value
-							  bitcase doc brief
-							  description see example))
-					     (loop (cdr lc))]
-					    [(member (caar lc)
-						     (append
-						      '(xidtype enum request reply switch)
-						      data-structures)) #t]
-					    [else #f])))
+				 (if (or (null? (cdr l))
+					 (maybe-insert-newline
+					  l
+					  struct-xml-tags
+					  '(op fieldref value bitcase)
+					  '(description see example brief doc)
+					  field-xml-tags))
 				     "))\n"
 				     "\n    ")))
 	(list->code-aux
@@ -357,7 +379,7 @@
 	 npad
 	 list-stack)]
        [(equal? (caadr l) 'value)
-	(put-string port (format "[~a (pad ~a ~a)]~a"
+	(put-string port (format "[~a (array ~a ~a)]~a"
 				 (string->symbol
 				  (safestring
 				   (cadr
@@ -373,21 +395,17 @@
 				      [(member t int16s) "(* integer-16)"]
 				      [(equal? t 'bool) "(* boolean)"]
 				      [(member t uint16s) "(* unsigned-16)"]
+				      [(member t int32s) "(* integer-32)"]
+				      [(member t int8s) "(* integer-8)"]
+				      [(equal? t 'void) "void*"]
 				      [else (symbol->string t)]))))
-				 (if (or (null? (cdr l)) 
-					 (let loop [(lc (cdr l))]
-					   (cond
-					    [(null? lc) #t]
-					    [(member (caar lc)
-						     '(op fieldref value
-							  bitcase doc brief
-							  description see example))
-					     (loop (cdr lc))]
-					    [(member (caar lc)
-						     (append
-						      '(xidtype enum request reply switch)
-						      data-structures)) #t]
-					    [else #f])))
+				 (if (or (null? (cdr l))
+					 (maybe-insert-newline
+					  l
+					  struct-xml-tags
+					  '(op fieldref value bitcase)
+					  '(description see example brief doc)
+					  field-xml-tags))
 				     "))\n"
 				     "\n    ")))
 	(list->code-aux
@@ -418,21 +436,16 @@
 					  [(member t int16s) "integer-16"]
 					  [(equal? t 'bool) "boolean"]
 					  [(member t uint16s) "unsigned-16"]
+					  [(member t int32s) "integer-32"]
+					  [(member t int8s) "integer-8"]
 					  [else (symbol->string t)]))))
-				     (if (or (null? (cdr l)) 
-					     (let loop [(lc (cdr l))]
-					       (cond
-						[(null? lc) #t]
-						[(member (caar lc)
-							 '(op fieldref value
-							      bitcase doc brief
-							      description see example))
-						 (loop (cdr lc))]
-						[(member (caar lc)
-							 (append
-							  '(xidtype enum request reply switch)
-							  data-structures)) #t]
-						[else #f])))
+				     (if (or (null? (cdr l))
+					     (maybe-insert-newline
+					      l
+					      struct-xml-tags
+					      '(op fieldref value bitcase)
+					      '(description see example brief doc)
+					      field-xml-tags))
 					 "))\n"
 					 "\n    ")))
 	    (put-string port (format "[~a ~a]~a"
@@ -450,21 +463,17 @@
 					  [(member t int16s) "(* integer-16)"]
 					  [(equal? t 'bool) "(* boolean)"]
 					  [(member t uint16s) "(* unsigned-16)"]
+					  [(member t int32s) "(* integer-32)"]
+					  [(member t int8s) "(* integer-8)"]
+					  [(equal? t 'void) "void*"]
 					  [else (format "(* ~a)" t)]))))
-				     (if (or (null? (cdr l)) 
-					     (let loop [(lc (cdr l))]
-					       (cond
-						[(null? lc) #t]
-						[(member (caar lc)
-							 '(op fieldref value
-							      bitcase doc brief
-							      description see example))
-						 (loop (cdr lc))]
-						[(member (caar lc)
-							 (append
-							  '(xidtype enum request reply switch)
-							  data-structures)) #t]
-						[else #f])))
+				     (if (or (null? (cdr l))
+					     (maybe-insert-newline
+					      l
+					      struct-xml-tags
+					      '(op fieldref value bitcase)
+					      '(description see example brief doc)
+					      field-xml-tags))
 					 "))\n"
 					 "\n    "))))
 	(list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) request-name needs-reply? npad list-stack)]
@@ -484,22 +493,16 @@
 				      [(member t int16s) "integer-16"]
 				      [(equal? t 'bool) "boolean"]
 				      [(member t uint16s) "unsigned-16"]
+				      [(member t int32s) "integer-32"]
+				      [(member t int8s) "integer-8"]
 				      [else (symbol->string t)]))))
-				 (if (or (null? (cdr l)) 
-					 (let loop [(lc (cdr l))]
-					   (display (format "ma ciao!! ~a\n" lc))
-					   (cond
-					    [(null? lc) #t]
-					    [(member (caar lc)
-						     '(op fieldref value
-							  bitcase doc brief
-							  description see example))
-					     (loop (cdr lc))]
-					    [(member (caar lc)
-						     (append
-						      '(xidtype enum request reply switch)
-						      data-structures)) #t]
-					    [else #f])))
+				 (if (or (null? (cdr l))
+					 (maybe-insert-newline
+					  l
+					  struct-xml-tags
+					  '(op fieldref value bitcase)
+					  '(description see example brief doc)
+					  field-xml-tags))
 				     "))\n"
 				     "\n    ")))
 	(list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) request-name needs-reply? npad list-stack)])]
@@ -544,4 +547,5 @@
 (list->code l filename)
 
 (close-port filename)
+
 (exit)
