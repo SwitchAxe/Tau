@@ -1,14 +1,28 @@
-(load "readfile.ss")
-(load "utility_with_views.ss")
-(load "memoization.ss")
-(define comment-start "<!--")
-(define comment-end "-->")
-(define cdata-start "<![CDATA[")
-(define cdata-end "]]>")
+(library (parse)
+  (export
+   sv-remove-comments
+   sv-remove-cdata
+   sv-remove-newlines
+   sv-has-xml-prolog?
+   sv-remove-xml-prolog
+   sv-has-xcb-header?
+   sv-remove-xcb-header
+   sv-try-collect-tag
+   sv-xml-parse-tag
+   push
+   pop
+   get-top
+   sv-xml->list)
+  (import (chezscheme)
+	  (memoization)
+	  (utility))
+ (define comment-start "<!--")
+ (define comment-end "-->")
+ (define cdata-start "<![CDATA[")
+ (define cdata-end "]]>")
 
-
-(define (sv-remove-comments-aux sv comment? string-start string-end strings)
-  (cond
+ (define (sv-remove-comments-aux sv comment? string-start string-end strings)
+   (cond
    [(< (- (string-length (string-view-s sv)) (string-view-index sv)) 3)
     (make-string-view
      (apply
@@ -373,3 +387,4 @@
   (memoize (lambda (xml) (sv-xml->list-aux xml '() '()))))
 
 
+)

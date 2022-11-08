@@ -1,4 +1,8 @@
 ;;------------------------ENUMS!-----------------------------
+(library (enums)
+	(export alist? enum enum? enum-lookup EE)
+	(import (chezscheme))
+
 (define (alist? l) ;;alist == association list
   (cond
    [(null? l) #t]
@@ -52,3 +56,4 @@
     (if (pair? maybe-value)
         (car maybe-value)
         #f)))
+)

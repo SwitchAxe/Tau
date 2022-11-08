@@ -1,0 +1,3 @@
+(for-each
+	(lambda (e) (compile-file e))
+	(directory-list "src/codegen/"))

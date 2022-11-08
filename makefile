@@ -1,13 +1,17 @@
-SCHEME = /usr/bin/chez
+SCHEME = /usr/bin/scheme
 
 CHEZVERSION = $(shell $(SCHEME) --version 2>&1)
 
-FFICFUNCTIONSPATH = src/lib/
+OBJPATH = objects/
 MAINSSPATH = src/main.ss
 COMPILEFLAGS = -Wall -Werror -lxcb -shared -fPIC
-.PHONY: build_shared_objects exec
+.PHONY: all build_shared_objects exec
+all: build_shared_objects
+
 exec:
-	chez -q $(MAINSSPATH)
+	scheme -q $(MAINSSPATH)
 build_shared_objects:
-	gcc ${COMPILEFLAGS} $(FFICFUNCTIONSPATH)/ffi_funcs.c -o ffi_funcs.so
-	mv ffi_funcs.so ${FFICFUNCTIONSPATH}
+	rm -rf objects
+	mkdir objects
+	scheme -q compile_lib.ss
+	mv src/lib/*.so ${OBJPATH}
