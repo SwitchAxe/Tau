@@ -24,6 +24,7 @@
   ;; #f -> no newline
   (define l '()) ;; just to be sure this compiles correctly
   (define (maybe-insert-newline lc tagl useless-tagl1 useless-tagl2 field-tagl)
+    (printf "in insert, next 3 elements of l: ~a\n" (take 3 lc))
     (let loop [(lc lc)]
       (cond
        [(null? lc)
@@ -32,10 +33,10 @@
        [(null? (cdr lc))
 	(set! l (cdr lc))
 	#t]
-       [(member (caadr lc) useless-tagl1)
+       [(member (caar lc) useless-tagl1)
 	(loop (cdr lc))]
-       [(member (caadr lc) useless-tagl2)
-	(let inner [(lcc (cdr lc))]
+       [(member (caar lc) useless-tagl2)
+	(let inner [(lcc lc)]
 	  (cond
 	   [(null? lcc)
 	    (set! l lcc)
@@ -43,7 +44,7 @@
 	   [(null? (cdr lcc))
 	    (set! l (cdr lcc))
 	    #t]
-	   [(member (caar lcc) tagl)
+	   [(member (caadr lcc) tagl)
 	    (set! l lcc)
 	    #t]
 	   [else
@@ -52,6 +53,15 @@
        [(member (caadr lc) field-tagl) #f]
        [else (loop (cdr lc))])))
 
+  (define (skip-docs l struct-tagl skip-tagl)
+    (cond
+     [(or (null? l) (null? (cdr l))) #t]
+     [(member (caadr l) skip-tagl)
+      (let loop [(lc (cdr l))]
+	(cond
+	 [(null? lc) lc]
+	 [(member (caar lc) struct-tagl) lc]
+	 [else (loop (cdr lc))]))]))
 
   (define tx
     (make-transcoder (utf-8-codec) (eol-style lf) (error-handling-mode raise)))
@@ -89,6 +99,8 @@
      [(null? l) #t]
      [(null? current-node) #t]
      [(pair? current-node)
+      (printf "current node: ~a\n" current-node)
+      (printf "next 3 elements: ~a\n" (take 3 l))
       (cond
        [needs-reply? ;;reply to a request struct
 	(put-string port (format "(define-ftype ~s-reply\n  (struct\n    "
@@ -510,16 +522,14 @@
        [(equal? (car current-node) 'value)
 	(list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) request-name needs-reply? npad list-stack)]
        [(member (car current-node)
-		'(value op fieldref bitcase doc brief description see example)) ;;just skip it
+		'(doc brief description see example)) ;;just skip it
 	;; use the insert newline function, even though we don't need to print
 	;; anything, just so we can skip to the next structure.
-	(maybe-insert-newline
-	 l
-	 struct-xml-tags
-	 '(op fieldref value bitcase)
-	 '(description see example brief doc)
-	 field-xml-tags)
-	(list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) request-name needs-reply? npad list-stack)]
+	(printf "found a doc! next 3 elements: ~a\n" (take 3 l))
+	(let [(skp (skip-docs l struct-xml-tags '(description see example brief doc)))]
+	    (list->code-aux port skp
+			    (if (or (null? skp) (null? (cdr skp))) '() (cadr skp))
+			    request-name needs-reply? npad list-stack))]
        [(equal? (car current-node) 'xidtype)
 	(put-string port (format "(define-ftype ~s unsigned-32)\n"
 				 (string->symbol
