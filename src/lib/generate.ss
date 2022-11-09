@@ -18,41 +18,6 @@
 		(cons (car xs) zs)))))
 
 
-  ;;DOC: TODO
-  ;; RETURNS A BOOLEAN
-  ;; #t -> newline must be inserted
-  ;; #f -> no newline
-  (define l '()) ;; just to be sure this compiles correctly
-  (define (maybe-insert-newline lc tagl useless-tagl1 useless-tagl2 field-tagl)
-    (printf "in insert, next 3 elements of l: ~a\n" (take 3 lc))
-    (let loop [(lc lc)]
-      (cond
-       [(null? lc)
-	(set! l lc) ;;l is an external variable
-	#t]
-       [(null? (cdr lc))
-	(set! l (cdr lc))
-	#t]
-       [(member (caar lc) useless-tagl1)
-	(loop (cdr lc))]
-       [(member (caar lc) useless-tagl2)
-	(let inner [(lcc lc)]
-	  (cond
-	   [(null? lcc)
-	    (set! l lcc)
-	    #t]
-	   [(null? (cdr lcc))
-	    (set! l (cdr lcc))
-	    #t]
-	   [(member (caadr lcc) tagl)
-	    (set! l lcc)
-	    #t]
-	   [else
-	    (inner (cdr lcc))]))]
-       [(member (caadr lc) tagl) #t]
-       [(member (caadr lc) field-tagl) #f]
-       [else (loop (cdr lc))])))
-
   (define (skip-docs l struct-tagl skip-tagl)
     (cond
      [(or (null? l) (null? (cdr l))) #t]
@@ -62,7 +27,56 @@
 	 [(null? lc) lc]
 	 [(member (caar lc) struct-tagl) lc]
 	 [else (loop (cdr lc))]))]))
+  
 
+  ;;DOC: TODO
+  ;; RETURNS A BOOLEAN
+  ;; #t -> newline must be inserted
+  ;; #f -> no newline
+  ;;  (define l '()) ;; just to be sure this compiles correctly
+  ;; (define (maybe-insert-newline lc tagl useless-tagl1 useless-tagl2 field-tagl)
+  ;;   (printf "in insert, next 3 elements of l: ~a\n" (take 3 lc))
+  ;;   (let loop [(lc lc)]
+  ;;     (cond
+  ;;      [(null? lc)
+  ;; 	(set! l lc) ;;l is an external variable
+  ;; 	#t]
+  ;;      [(null? (cdr lc))
+  ;; 	(set! l (cdr lc))
+  ;; 	#t]
+  ;;      [(member (caadr lc) useless-tagl1)
+  ;; 	(loop (cdr lc))]
+  ;;      [(member (caadr lc) useless-tagl2)
+  ;; 	(let inner [(lcc (cdr lc))]
+  ;; 	  (cond
+  ;; 	   [(null? lcc)
+  ;; 	    (set! l lcc)
+  ;; 	    #t]
+  ;; 	   [(member (caar lcc) tagl)
+  ;; 	    (set! l lcc)
+  ;; 	    #t]
+  ;; 	   [else
+  ;; 	    (inner (cdr lcc))]))]
+  ;;      [(member (caadr lc) tagl) #t]
+  ;;      [(member (caadr lc) field-tagl) #f]
+  ;;      [else (loop (cdr lc))])))
+
+  (define (maybe-insert-newline lc struct-tagl doc-tagl field-tagl)
+    (let loop [(lc lc)]
+     (cond
+      [(null? lc) (cons #t (cons '() '()))]
+      [(null? (cdr lc)) (cons #t (cons '() '()))]
+      [(member (caadr lc) struct-tagl) (cons #t (cons lc '()))]
+      [(member (caadr lc) doc-tagl)
+       (let inner [(lcc lc)]
+	 (cond
+	  [(null? (cdr lcc)) (cons #t (cons '() '()))]
+	  [(member (caadr lcc) struct-tagl) (cons #t (cons lcc '()))]
+	  [else (inner (cdr lcc))]))]
+      [(member (caadr lc) field-tagl)
+       (cons #f (cons lc '()))]
+      [else (loop (cdr lc))])))
+  
   (define tx
     (make-transcoder (utf-8-codec) (eol-style lf) (error-handling-mode raise)))
 
@@ -291,12 +305,13 @@
 		       [(member (string->symbol t) int32s) "integer-32"]
 		       [(member (string->symbol t) int8s) "integer-8"]
 		       [else t]))))])
-		(if (or (null? (cdr l)) (maybe-insert-newline
-					 l
-					 struct-xml-tags
-					 '(op fieldref value bitcase)
-					 '(description see example brief doc)
-					 field-xml-tags))
+		(if (or (null? (cdr l)) (let [(maybel (maybe-insert-newline
+						       l
+						       struct-xml-tags
+						       '(description see example brief doc)
+						       field-xml-tags))]
+					  (set! l (cadr maybel))
+					  (car maybel)))
 		    "))\n"
 		    "\n    ")))
 	      (list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) request-name needs-reply? npad list-stack)))]
@@ -305,12 +320,13 @@
 				 (string->symbol (caddr current-node))
 				 'unsigned-32
 				 (if (or (null? (cdr l))
-					 (maybe-insert-newline
-					  l
-					  struct-xml-tags
-					  '(op fieldref value bitcase)
-					  '(description see example brief doc)
-					  field-xml-tags))
+					 (let [(maybel (maybe-insert-newline
+							l
+							struct-xml-tags
+							'(description see example brief doc)
+							field-xml-tags))]
+					   (set! l (cadr maybel))
+					   (car maybel)))
 				     "))\n"
 				     "\n    ")))
 	(list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) request-name needs-reply? npad list-stack)]
@@ -319,12 +335,13 @@
 				 npad
 				 (safestring (cadadr current-node))
 				 (if (or (null? (cdr l))
-					 (maybe-insert-newline
-					  l
-					  struct-xml-tags
-					  '(op fieldref value bitcase)
-					  '(description see example brief doc)
-				          field-xml-tags))
+					 (let [(maybel (maybe-insert-newline
+							l
+							struct-xml-tags
+							'(description see example brief doc)
+							field-xml-tags))]
+					   (set! l (cadr maybel))
+					   (car maybel)))
 				     "))\n"
 				     "\n    ")))
 	(list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) request-name needs-reply? (add1 npad) list-stack)]
@@ -375,12 +392,13 @@
 					[(equal? t 'void) "void*"]
 					[else (format "(* ~a)" t)]))))
 				   (if (or (null? (cdr l))
-					   (maybe-insert-newline
-					    l
-					    struct-xml-tags
-					    '(op fieldref value bitcase)
-					    '(description see example brief doc)
-					    field-xml-tags))
+					   (let [(maybel (maybe-insert-newline
+							  l
+							  struct-xml-tags
+							  '(description see example brief doc)
+							  field-xml-tags))]
+					     (set! l (cadr maybel))
+					     (car maybel)))
 				       "))\n"
 				       "\n    ")))
 	  (list->code-aux
@@ -413,12 +431,13 @@
 					[(equal? t 'void) "void*"]
 					[else (symbol->string t)]))))
 				   (if (or (null? (cdr l))
-					   (maybe-insert-newline
-					    l
-					    struct-xml-tags
-					    '(op fieldref value bitcase)
-					    '(description see example brief doc)
-					    field-xml-tags))
+					   (let [(maybel (maybe-insert-newline
+							  l
+							  struct-xml-tags
+							  '(description see example brief doc)
+							  field-xml-tags))]
+					     (set! l (cadr maybel))
+					     (car maybel)))
 				       "))\n"
 				       "\n    ")))
 	  (list->code-aux
@@ -453,12 +472,13 @@
 					    [(member t int8s) "integer-8"]
 					    [else (symbol->string t)]))))
 				       (if (or (null? (cdr l))
-					       (maybe-insert-newline
-						l
-						struct-xml-tags
-						'(op fieldref value bitcase)
-						'(description see example brief doc)
-						field-xml-tags))
+					       (let [(maybel (maybe-insert-newline
+							      l
+							      struct-xml-tags
+							      '(description see example brief doc)
+							      field-xml-tags))]
+						 (set! l (cadr maybel))
+						 (car maybel)))
 					   "))\n"
 					   "\n    ")))
 	      (put-string port (format "[~a ~a]~a"
@@ -468,8 +488,9 @@
 					  (assoc 'name (cdr current-node)))))
 				       (string->symbol
 					(safestring
-					 (let [(t (string->symbol (safestring
-								   (cadr (assoc 'type (cdr current-node))))))]
+					 (let [(t (string->symbol
+						   (safestring
+						    (cadr (assoc 'type (cdr current-node))))))]
 					   (cond
 					    [(member t uint8s) "(* unsigned-8)"]
 					    [(member t uint32s) "(* unsigned-32)"]
@@ -481,12 +502,13 @@
 					    [(equal? t 'void) "void*"]
 					    [else (format "(* ~a)" t)]))))
 				       (if (or (null? (cdr l))
-					       (maybe-insert-newline
-						l
-						struct-xml-tags
-						'(op fieldref value bitcase)
-						'(description see example brief doc)
-						field-xml-tags))
+					       (let [(maybel (maybe-insert-newline
+							      l
+							      struct-xml-tags
+							      '(description see example brief doc)
+							      field-xml-tags))]
+						 (set! l (cadr maybel))
+						 (car maybel)))
 					   "))\n"
 					   "\n    "))))
 	  (list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) request-name needs-reply? npad list-stack)]
@@ -498,8 +520,9 @@
 				      (assoc 'name (cdr current-node)))))
 				   (string->symbol
 				    (safestring
-				     (let [(t (string->symbol (safestring
-							       (cadr (assoc 'type (cdr current-node))))))]
+				     (let [(t (string->symbol
+					       (safestring
+						(cadr (assoc 'type (cdr current-node))))))]
 				       (cond
 					[(member t uint8s) "unsigned-8"]
 					[(member t uint32s) "unsigned-32"]
@@ -510,12 +533,13 @@
 					[(member t int8s) "integer-8"]
 					[else (symbol->string t)]))))
 				   (if (or (null? (cdr l))
-					   (maybe-insert-newline
-					    l
-					    struct-xml-tags
-					    '(op fieldref value bitcase)
-					    '(description see example brief doc)
-					    field-xml-tags))
+					   (let [(maybel (maybe-insert-newline
+							  l
+							  struct-xml-tags
+							  '(description see example brief doc)
+							  field-xml-tags))]
+					     (set! l (cadr maybel))
+					     (car maybel)))
 				       "))\n"
 				       "\n    ")))
 	  (list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) request-name needs-reply? npad list-stack)])]
@@ -542,9 +566,9 @@
 			(if (null? (cdr l)) '() (cadr l)) "" #f 0 list-stack)])]
      [else
       #f]))
-
+  
   (define (list->code l port)
-    (put-string port "(load \"enum.ss\")\n")
+    (put-string port "(import (enums))\n")
     (list->code-aux port l (car l) "" #f 0 '()))
   (define (prepare-xml filename)
     (sv-remove-xcb-header
