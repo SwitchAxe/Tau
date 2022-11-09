@@ -89,9 +89,6 @@
      [(null? l) #t]
      [(null? current-node) #t]
      [(pair? current-node)
-      (printf "current node = ~s\n" current-node)
-      (printf "next 3 elements: ~s\n" (take 3 (cdr l)))
-      (printf "list stack: ~s\n" list-stack)
       (cond
        [needs-reply? ;;reply to a request struct
 	(put-string port (format "(define-ftype ~s-reply\n  (struct\n    "
@@ -306,8 +303,6 @@
 				     "\n    ")))
 	(list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) request-name needs-reply? npad list-stack)]
        [(equal? (car current-node) 'pad)
-	(printf "found a pad! the next element in the list is: ~s\n\n\n\n\n\n"
-		(caadr l))
 	(put-string port (format "[pad~s (array ~a unsigned-8)]~a"
 				 npad
 				 (safestring (cadadr current-node))
@@ -516,6 +511,14 @@
 	(list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) request-name needs-reply? npad list-stack)]
        [(member (car current-node)
 		'(value op fieldref bitcase doc brief description see example)) ;;just skip it
+	;; use the insert newline function, even though we don't need to print
+	;; anything, just so we can skip to the next structure.
+	(maybe-insert-newline
+	 l
+	 struct-xml-tags
+	 '(op fieldref value bitcase)
+	 '(description see example brief doc)
+	 field-xml-tags)
 	(list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) request-name needs-reply? npad list-stack)]
        [(equal? (car current-node) 'xidtype)
 	(put-string port (format "(define-ftype ~s unsigned-32)\n"

@@ -180,7 +180,14 @@
     (substring
      (string-view-s xml-sv)
      (string-length (string-view-s (sv-string-collect-until xml-sv ">")))
-     (- (string-length (string-view-s xml-sv)) 5))
+     (- (string-length (string-view-s xml-sv))
+	(string-length
+	 (string-view-s
+	  (sv-string-collect-until
+	   (make-string-view (list->string
+			      (reverse (string->list
+					(string-view-s xml-sv)))) 0)
+	   "<")))))
     0)))
 
 (define (sv-try-collect-tag sv)
