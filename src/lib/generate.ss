@@ -209,57 +209,6 @@
 	    (set! int8s (cons nt int8s))]))
 	(list->code-aux port (if (not (null? l)) (cdr l) '())
 			(if (null? (cdr l)) '() (cadr l)) "" #f 0 list-stack)]
-       ;; [(equal? (car current-node) 'enum)
-       ;; 	(let [(enum-name (safestring (cadr (assoc 'name (cdr current-node)))))]
-       ;;    (put-string port
-       ;;                (format
-       ;;                 "\n(define ~s (enum "
-       ;;                 (string->symbol enum-name)))
-       ;;    (let loop [(enuml '()) (lc (cdr l)) (idx 0)]
-       ;;      (cond
-       ;;       [(member (caar lc) struct-xml-tags)
-       ;;        (put-string port (format "'(~s"
-       ;; 				       (car enuml)))
-       ;; 	      (if (= (length enuml) 1)
-       ;; 		  (begin
-       ;; 		    (put-string port ")))\n")
-       ;; 		    (list->code-aux port lc (car lc) "" #f 0 list-stack))
-       ;; 		  (let inner [(enuml-cp (cdr enuml)) (elem (cadr enuml))]
-       ;; 		    (cond
-       ;; 		     [(null? (cdr enuml-cp))
-       ;; 		      (put-string port (format "\n    ~s)))\n" (car enuml-cp)))
-       ;; 		      (list->code-aux port lc (car lc) "" #f 0 list-stack)]
-       ;; 		     [(null? enuml-cp)
-       ;; 		      (put-string port (format "\n    ~s)))\n" elem))
-       ;; 		      (list->code-aux port lc (car lc) "" #f 0 list-stack)]
-       ;; 		     [else
-       ;; 		      (put-string port (format "\n    ~s" elem))
-       ;; 		      (inner (cdr enuml-cp) (if (null? (cdr enuml-cp))
-       ;; 						(car enuml-cp)
-       ;; 						(cadr enuml-cp)))])))]
-       ;;       [(equal? (caar lc) 'item)
-       ;;        (loop
-       ;;         (add
-       ;; 		(add
-       ;; 		 (cond
-       ;;            [(equal? (caadr lc) 'value)
-       ;;             (string->number (cadadr lc))]
-       ;;            [(equal? (caadr lc) 'bit)
-       ;;             (<< 1 (string->number (cadadr lc)))])
-       ;; 		 (string->symbol
-       ;;            (string-append
-       ;;             enum-name
-       ;;             "-"
-       ;;             (safestring
-       ;;              (cadr
-       ;;               (assoc
-       ;;                'name
-       ;;                (cdar lc)))))))
-       ;; 		enuml)
-       ;;         (cddr lc)
-       ;;         idx)]
-       ;;       [else
-       ;;        (loop enuml (cdr lc) (+ 1 idx))])))]
        [(equal? (car current-node) 'enum)
 	(let [(enum-name (safestring
 			  (cadr (assoc 'name (cdr current-node)))))]
