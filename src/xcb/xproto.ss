@@ -42,13 +42,13 @@
     [bits_per_pixel unsigned-8]
     [scanline_pad unsigned-8]
     [pad0 (array 5 unsigned-8)]))
-
-(define visualclass (enum '((visualclass-staticgray 0)
-    (visualclass-grayscale 1)
-    (visualclass-staticcolor 2)
-    (visualclass-pseudocolor 3)
-    (visualclass-truecolor 4)
-    (visualclass-directcolor 5))))
+(define visualclass (enum
+  '((visualclass-staticgray 0)
+  (visualclass-grayscale 0)
+  (visualclass-staticcolor 1)
+  (visualclass-pseudocolor 2)
+  (visualclass-truecolor 3)
+  (visualclass-directcolor 4))))
 (define-ftype visualtype
   (struct
     [visual_id unsigned-32]
@@ -66,37 +66,37 @@
     [visuals_len unsigned-16]
     [pad1 (array 4 unsigned-8)]
     [visuals (* visualtype)]))
-
-(define eventmask (enum '((eventmask-noevent 0)
-    (eventmask-keypress 1)
-    (eventmask-keyrelease 2)
-    (eventmask-buttonpress 4)
-    (eventmask-buttonrelease 8)
-    (eventmask-enterwindow 16)
-    (eventmask-leavewindow 32)
-    (eventmask-pointermotion 64)
-    (eventmask-pointermotionhint 128)
-    (eventmask-button1motion 256)
-    (eventmask-button2motion 512)
-    (eventmask-button3motion 1024)
-    (eventmask-button4motion 2048)
-    (eventmask-button5motion 4096)
-    (eventmask-buttonmotion 8192)
-    (eventmask-keymapstate 16384)
-    (eventmask-exposure 32768)
-    (eventmask-visibilitychange 65536)
-    (eventmask-structurenotify 131072)
-    (eventmask-resizeredirect 262144)
-    (eventmask-substructurenotify 524288)
-    (eventmask-substructureredirect 1048576)
-    (eventmask-focuschange 2097152)
-    (eventmask-propertychange 4194304)
-    (eventmask-colormapchange 8388608)
-    (eventmask-ownergrabbutton 16777216))))
-
-(define backingstore (enum '((backingstore-notuseful 0)
-    (backingstore-whenmapped 1)
-    (backingstore-always 2))))
+(define eventmask (enum
+  '((eventmask-noevent 0)
+  (eventmask-keypress 0)
+  (eventmask-keyrelease 1)
+  (eventmask-buttonpress 2)
+  (eventmask-buttonrelease 4)
+  (eventmask-enterwindow 8)
+  (eventmask-leavewindow 16)
+  (eventmask-pointermotion 32)
+  (eventmask-pointermotionhint 64)
+  (eventmask-button1motion 128)
+  (eventmask-button2motion 256)
+  (eventmask-button3motion 512)
+  (eventmask-button4motion 1024)
+  (eventmask-button5motion 2048)
+  (eventmask-buttonmotion 4096)
+  (eventmask-keymapstate 8192)
+  (eventmask-exposure 16384)
+  (eventmask-visibilitychange 32768)
+  (eventmask-structurenotify 65536)
+  (eventmask-resizeredirect 131072)
+  (eventmask-substructurenotify 262144)
+  (eventmask-substructureredirect 524288)
+  (eventmask-focuschange 1048576)
+  (eventmask-propertychange 2097152)
+  (eventmask-colormapchange 4194304)
+  (eventmask-ownergrabbutton 8388608))))
+(define backingstore (enum
+  '((backingstore-notuseful 0)
+  (backingstore-whenmapped 0)
+  (backingstore-always 1))))
 (define-ftype screen
   (struct
     [root unsigned-32]
@@ -143,9 +143,9 @@
     [pad0 (array 5 unsigned-8)]
     [length unsigned-16]
     [reason (array 4 unsigned-8)]))
-
-(define imageorder (enum '((imageorder-lsbfirst 0)
-    (imageorder-msbfirst 1))))
+(define imageorder (enum
+  '((imageorder-lsbfirst 0)
+  (imageorder-msbfirst 0))))
 (define-ftype setup
   (struct
     [status unsigned-8]
@@ -172,144 +172,401 @@
     [pad2 (array 4 unsigned-8)]
     [pixmap_formats (* format)]
     [roots (* screen)]))
-
-(define modmask (enum '((modmask-shift 1)
-    (modmask-lock 2)
-    (modmask-control 4)
-    (modmask-1 8)
-    (modmask-2 16)
-    (modmask-3 32)
-    (modmask-4 64)
-    (modmask-5 128)
-    (modmask-any 32768))))
-
-(define keybutmask (enum '((keybutmask-shift 1)
-    (keybutmask-lock 2)
-    (keybutmask-control 4)
-    (keybutmask-mod1 8)
-    (keybutmask-mod2 16)
-    (keybutmask-mod3 32)
-    (keybutmask-mod4 64)
-    (keybutmask-mod5 128)
-    (keybutmask-button1 256)
-    (keybutmask-button2 512)
-    (keybutmask-button3 1024)
-    (keybutmask-button4 2048)
-    (keybutmask-button5 4096))))
-
-(define window (enum '((window-none 0))))
-
-(define buttonmask (enum '((buttonmask-1 256)
-    (buttonmask-2 512)
-    (buttonmask-3 1024)
-    (buttonmask-4 2048)
-    (buttonmask-5 4096)
-    (buttonmask-any 32768))))
-
-(define motion (enum '((motion-normal 0)
-    (motion-hint 1))))
-
-(define notifydetail (enum '((notifydetail-ancestor 0)
-    (notifydetail-virtual 1)
-    (notifydetail-inferior 2)
-    (notifydetail-nonlinear 3)
-    (notifydetail-nonlinearvirtual 4)
-    (notifydetail-pointer 5)
-    (notifydetail-pointerroot 6)
-    (notifydetail-none 7))))
-
-(define notifymode (enum '((notifymode-normal 0)
-    (notifymode-grab 1)
-    (notifymode-ungrab 2)
-    (notifymode-whilegrabbed 3))))
-
-(define visibility (enum '((visibility-unobscured 0)
-    (visibility-partiallyobscured 1)
-    (visibility-fullyobscured 2))))
-
-(define place (enum '((place-ontop 0)
-    (place-onbottom 1))))
-
-(define property (enum '((property-newvalue 0)
-    (property-delete 1))))
-
-(define time (enum '((time-currenttime 0))))
-
-(define atom (enum '((atom-none 0)
-    (atom-any 0)
-    (atom-primary 1)
-    (atom-secondary 2)
-    (atom-arc 3)
-    (atom-atom 4)
-    (atom-bitmap 5)
-    (atom-cardinal 6)
-    (atom-colormap 7)
-    (atom-cursor 8)
-    (atom-cut_buffer0 9)
-    (atom-cut_buffer1 10)
-    (atom-cut_buffer2 11)
-    (atom-cut_buffer3 12)
-    (atom-cut_buffer4 13)
-    (atom-cut_buffer5 14)
-    (atom-cut_buffer6 15)
-    (atom-cut_buffer7 16)
-    (atom-drawable 17)
-    (atom-font 18)
-    (atom-integer 19)
-    (atom-pixmap 20)
-    (atom-point 21)
-    (atom-rectangle 22)
-    (atom-resource_manager 23)
-    (atom-rgb_color_map 24)
-    (atom-rgb_best_map 25)
-    (atom-rgb_blue_map 26)
-    (atom-rgb_default_map 27)
-    (atom-rgb_gray_map 28)
-    (atom-rgb_green_map 29)
-    (atom-rgb_red_map 30)
-    (atom-string 31)
-    (atom-visualid 32)
-    (atom-window 33)
-    (atom-wm_command 34)
-    (atom-wm_hints 35)
-    (atom-wm_client_machine 36)
-    (atom-wm_icon_name 37)
-    (atom-wm_icon_size 38)
-    (atom-wm_name 39)
-    (atom-wm_normal_hints 40)
-    (atom-wm_size_hints 41)
-    (atom-wm_zoom_hints 42)
-    (atom-min_space 43)
-    (atom-norm_space 44)
-    (atom-max_space 45)
-    (atom-end_space 46)
-    (atom-superscript_x 47)
-    (atom-superscript_y 48)
-    (atom-subscript_x 49)
-    (atom-subscript_y 50)
-    (atom-underline_position 51)
-    (atom-underline_thickness 52)
-    (atom-strikeout_ascent 53)
-    (atom-strikeout_descent 54)
-    (atom-italic_angle 55)
-    (atom-x_height 56)
-    (atom-quad_width 57)
-    (atom-weight 58)
-    (atom-point_size 59)
-    (atom-resolution 60)
-    (atom-copyright 61)
-    (atom-notice 62)
-    (atom-font_name 63)
-    (atom-family_name 64)
-    (atom-full_name 65)
-    (atom-cap_height 66)
-    (atom-wm_class 67)
-    (atom-wm_transient_for 68))))
-
-(define colormapstate (enum '((colormapstate-uninstalled 0)
-    (colormapstate-installed 1))))
-
-(define colormap (enum '((colormap-none 0))))
+(define modmask (enum
+  '((modmask-shift 1)
+  (modmask-lock 1)
+  (modmask-control 2)
+  (modmask-1 4)
+  (modmask-2 8)
+  (modmask-3 16)
+  (modmask-4 32)
+  (modmask-5 64)
+  (modmask-any 128))))
+(define keybutmask (enum
+  '((keybutmask-shift 1)
+  (keybutmask-lock 1)
+  (keybutmask-control 2)
+  (keybutmask-mod1 4)
+  (keybutmask-mod2 8)
+  (keybutmask-mod3 16)
+  (keybutmask-mod4 32)
+  (keybutmask-mod5 64)
+  (keybutmask-button1 128)
+  (keybutmask-button2 256)
+  (keybutmask-button3 512)
+  (keybutmask-button4 1024)
+  (keybutmask-button5 2048))))
+(define window (enum
+  '((window-none 0))))
+(define keypress-number 2)
+(define-ftype keypress
+    (struct
+    [detail unsigned-8]
+    [time unsigned-32]
+    [root unsigned-32]
+    [event unsigned-32]
+    [child unsigned-32]
+    [root_x integer-16]
+    [root_y integer-16]
+    [event_x integer-16]
+    [event_y integer-16]
+    [state-mask unsigned-16]
+    [same_screen boolean]
+    [pad0 (array 1 unsigned-8)]))
+(define buttonmask (enum
+  '((buttonmask-1 256)
+  (buttonmask-2 256)
+  (buttonmask-3 512)
+  (buttonmask-4 1024)
+  (buttonmask-5 2048)
+  (buttonmask-any 4096))))
+(define buttonpress-number 4)
+(define-ftype buttonpress
+    (struct
+    [detail unsigned-8]
+    [time unsigned-32]
+    [root unsigned-32]
+    [event unsigned-32]
+    [child unsigned-32]
+    [root_x integer-16]
+    [root_y integer-16]
+    [event_x integer-16]
+    [event_y integer-16]
+    [state-mask unsigned-16]
+    [same_screen boolean]
+    [pad0 (array 1 unsigned-8)]))
+(define motion (enum
+  '((motion-normal 0)
+  (motion-hint 0))))
+(define motionnotify-number 6)
+(define-ftype motionnotify
+    (struct
+    [detail-enum unsigned-8]
+    [time unsigned-32]
+    [root unsigned-32]
+    [event unsigned-32]
+    [child unsigned-32]
+    [root_x integer-16]
+    [root_y integer-16]
+    [event_x integer-16]
+    [event_y integer-16]
+    [state-mask unsigned-16]
+    [same_screen boolean]
+    [pad0 (array 1 unsigned-8)]))
+(define notifydetail (enum
+  '((notifydetail-ancestor 0)
+  (notifydetail-virtual 0)
+  (notifydetail-inferior 1)
+  (notifydetail-nonlinear 2)
+  (notifydetail-nonlinearvirtual 3)
+  (notifydetail-pointer 4)
+  (notifydetail-pointerroot 5)
+  (notifydetail-none 6))))
+(define notifymode (enum
+  '((notifymode-normal 0)
+  (notifymode-grab 0)
+  (notifymode-ungrab 1)
+  (notifymode-whilegrabbed 2))))
+(define enternotify-number 7)
+(define-ftype enternotify
+    (struct
+    [detail-enum unsigned-8]
+    [time unsigned-32]
+    [root unsigned-32]
+    [event unsigned-32]
+    [child unsigned-32]
+    [root_x integer-16]
+    [root_y integer-16]
+    [event_x integer-16]
+    [event_y integer-16]
+    [state-mask unsigned-16]
+    [mode-enum unsigned-8]
+    [same_screen_focus unsigned-8]))
+(define focusin-number 9)
+(define-ftype focusin
+    (struct
+    [detail-enum unsigned-8]
+    [event unsigned-32]
+    [mode-enum unsigned-8]
+    [pad0 (array 3 unsigned-8)]))
+(define keymapnotify-number 11)
+(define-ftype keymapnotify
+    (struct
+    [keys (array 31 (* unsigned-8))]))
+(define expose-number 12)
+(define-ftype expose
+    (struct
+    [pad1 (array 1 unsigned-8)]
+    [window unsigned-32]
+    [x unsigned-16]
+    [y unsigned-16]
+    [width unsigned-16]
+    [height unsigned-16]
+    [count unsigned-16]
+    [pad2 (array 2 unsigned-8)]))
+(define graphicsexposure-number 13)
+(define-ftype graphicsexposure
+    (struct
+    [pad3 (array 1 unsigned-8)]
+    [drawable unsigned-32]
+    [x unsigned-16]
+    [y unsigned-16]
+    [width unsigned-16]
+    [height unsigned-16]
+    [minor_opcode unsigned-16]
+    [count unsigned-16]
+    [major_opcode unsigned-8]
+    [pad4 (array 3 unsigned-8)]))
+(define noexposure-number 14)
+(define-ftype noexposure
+    (struct
+    [pad5 (array 1 unsigned-8)]
+    [drawable unsigned-32]
+    [minor_opcode unsigned-16]
+    [major_opcode unsigned-8]
+    [pad6 (array 1 unsigned-8)]))
+(define visibility (enum
+  '((visibility-unobscured 0)
+  (visibility-partiallyobscured 0)
+  (visibility-fullyobscured 1))))
+(define visibilitynotify-number 15)
+(define-ftype visibilitynotify
+    (struct
+    [pad0 (array 1 unsigned-8)]
+    [window unsigned-32]
+    [state-enum unsigned-8]
+    [pad1 (array 3 unsigned-8)]))
+(define createnotify-number 16)
+(define-ftype createnotify
+    (struct
+    [pad2 (array 1 unsigned-8)]
+    [parent unsigned-32]
+    [window unsigned-32]
+    [x integer-16]
+    [y integer-16]
+    [width unsigned-16]
+    [height unsigned-16]
+    [border_width unsigned-16]
+    [override_redirect boolean]
+    [pad3 (array 1 unsigned-8)]))
+(define destroynotify-number 17)
+(define-ftype destroynotify
+    (struct
+    [pad4 (array 1 unsigned-8)]
+    [event unsigned-32]
+    [window unsigned-32]))
+(define unmapnotify-number 18)
+(define-ftype unmapnotify
+    (struct
+    [pad5 (array 1 unsigned-8)]
+    [event unsigned-32]
+    [window unsigned-32]
+    [from_configure boolean]
+    [pad6 (array 3 unsigned-8)]))
+(define mapnotify-number 19)
+(define-ftype mapnotify
+    (struct
+    [pad7 (array 1 unsigned-8)]
+    [event unsigned-32]
+    [window unsigned-32]
+    [override_redirect boolean]
+    [pad8 (array 3 unsigned-8)]))
+(define maprequest-number 20)
+(define-ftype maprequest
+    (struct
+    [pad9 (array 1 unsigned-8)]
+    [parent unsigned-32]
+    [window unsigned-32]))
+(define reparentnotify-number 21)
+(define-ftype reparentnotify
+    (struct
+    [pad10 (array 1 unsigned-8)]
+    [event unsigned-32]
+    [window unsigned-32]
+    [parent unsigned-32]
+    [x integer-16]
+    [y integer-16]
+    [override_redirect boolean]
+    [pad11 (array 3 unsigned-8)]))
+(define configurenotify-number 22)
+(define-ftype configurenotify
+    (struct
+    [pad12 (array 1 unsigned-8)]
+    [event unsigned-32]
+    [window unsigned-32]
+    [above_sibling unsigned-32]
+    [x integer-16]
+    [y integer-16]
+    [width unsigned-16]
+    [height unsigned-16]
+    [border_width unsigned-16]
+    [override_redirect boolean]
+    [pad13 (array 1 unsigned-8)]))
+(define configurerequest-number 23)
+(define-ftype configurerequest
+    (struct
+    [stack_mode-enum unsigned-8]
+    [parent unsigned-32]
+    [window unsigned-32]
+    [sibling unsigned-32]
+    [x integer-16]
+    [y integer-16]
+    [width unsigned-16]
+    [height unsigned-16]
+    [border_width unsigned-16]
+    [value_mask-mask unsigned-16]))
+(define gravitynotify-number 24)
+(define-ftype gravitynotify
+    (struct
+    [pad14 (array 1 unsigned-8)]
+    [event unsigned-32]
+    [window unsigned-32]
+    [x integer-16]
+    [y integer-16]))
+(define resizerequest-number 25)
+(define-ftype resizerequest
+    (struct
+    [pad15 (array 1 unsigned-8)]
+    [window unsigned-32]
+    [width unsigned-16]
+    [height unsigned-16]))
+(define place (enum
+  '((place-ontop 0)
+  (place-onbottom 0))))
+(define circulatenotify-number 26)
+(define-ftype circulatenotify
+    (struct
+    [pad0 (array 1 unsigned-8)]
+    [event unsigned-32]
+    [window unsigned-32]
+    [pad1 (array 4 unsigned-8)]
+    [place-enum unsigned-8]
+    [pad2 (array 3 unsigned-8)]))
+(define property (enum
+  '((property-newvalue 0)
+  (property-delete 0))))
+(define propertynotify-number 28)
+(define-ftype propertynotify
+    (struct
+    [pad0 (array 1 unsigned-8)]
+    [window unsigned-32]
+    [atom unsigned-32]
+    [time unsigned-32]
+    [state-enum unsigned-8]
+    [pad1 (array 3 unsigned-8)]))
+(define selectionclear-number 29)
+(define-ftype selectionclear
+    (struct
+    [pad2 (array 1 unsigned-8)]
+    [time unsigned-32]
+    [owner unsigned-32]
+    [selection unsigned-32]))
+(define time (enum
+  '((time-currenttime 0))))
+(define atom (enum
+  '((atom-none 0)
+  (atom-any 0)
+  (atom-primary 0)
+  (atom-secondary 1)
+  (atom-arc 2)
+  (atom-atom 3)
+  (atom-bitmap 4)
+  (atom-cardinal 5)
+  (atom-colormap 6)
+  (atom-cursor 7)
+  (atom-cut_buffer0 8)
+  (atom-cut_buffer1 9)
+  (atom-cut_buffer2 10)
+  (atom-cut_buffer3 11)
+  (atom-cut_buffer4 12)
+  (atom-cut_buffer5 13)
+  (atom-cut_buffer6 14)
+  (atom-cut_buffer7 15)
+  (atom-drawable 16)
+  (atom-font 17)
+  (atom-integer 18)
+  (atom-pixmap 19)
+  (atom-point 20)
+  (atom-rectangle 21)
+  (atom-resource_manager 22)
+  (atom-rgb_color_map 23)
+  (atom-rgb_best_map 24)
+  (atom-rgb_blue_map 25)
+  (atom-rgb_default_map 26)
+  (atom-rgb_gray_map 27)
+  (atom-rgb_green_map 28)
+  (atom-rgb_red_map 29)
+  (atom-string 30)
+  (atom-visualid 31)
+  (atom-window 32)
+  (atom-wm_command 33)
+  (atom-wm_hints 34)
+  (atom-wm_client_machine 35)
+  (atom-wm_icon_name 36)
+  (atom-wm_icon_size 37)
+  (atom-wm_name 38)
+  (atom-wm_normal_hints 39)
+  (atom-wm_size_hints 40)
+  (atom-wm_zoom_hints 41)
+  (atom-min_space 42)
+  (atom-norm_space 43)
+  (atom-max_space 44)
+  (atom-end_space 45)
+  (atom-superscript_x 46)
+  (atom-superscript_y 47)
+  (atom-subscript_x 48)
+  (atom-subscript_y 49)
+  (atom-underline_position 50)
+  (atom-underline_thickness 51)
+  (atom-strikeout_ascent 52)
+  (atom-strikeout_descent 53)
+  (atom-italic_angle 54)
+  (atom-x_height 55)
+  (atom-quad_width 56)
+  (atom-weight 57)
+  (atom-point_size 58)
+  (atom-resolution 59)
+  (atom-copyright 60)
+  (atom-notice 61)
+  (atom-font_name 62)
+  (atom-family_name 63)
+  (atom-full_name 64)
+  (atom-cap_height 65)
+  (atom-wm_class 66)
+  (atom-wm_transient_for 67))))
+(define selectionrequest-number 30)
+(define-ftype selectionrequest
+    (struct
+    [pad0 (array 1 unsigned-8)]
+    [time unsigned-32]
+    [owner unsigned-32]
+    [requestor unsigned-32]
+    [selection unsigned-32]
+    [target unsigned-32]
+    [property unsigned-32]))
+(define selectionnotify-number 31)
+(define-ftype selectionnotify
+    (struct
+    [pad1 (array 1 unsigned-8)]
+    [time unsigned-32]
+    [requestor unsigned-32]
+    [selection unsigned-32]
+    [target unsigned-32]
+    [property unsigned-32]))
+(define colormapstate (enum
+  '((colormapstate-uninstalled 0)
+  (colormapstate-installed 0))))
+(define colormap (enum
+  '((colormap-none 0))))
+(define colormapnotify-number 32)
+(define-ftype colormapnotify
+    (struct
+    [pad0 (array 1 unsigned-8)]
+    [window unsigned-32]
+    [colormap unsigned-32]
+    [new boolean]
+    [state-enum unsigned-8]
+    [pad1 (array 2 unsigned-8)]))
 (define-ftype clientmessagedata
   (union
     [data8 (array 20 (* unsigned-8))]
@@ -322,46 +579,78 @@
     [window unsigned-32]
     [type unsigned-32]
     [data clientmessagedata]))
-
-(define mapping (enum '((mapping-modifier 0)
-    (mapping-keyboard 1)
-    (mapping-pointer 2))))
-
-(define windowclass (enum '((windowclass-copyfromparent 0)
-    (windowclass-inputoutput 1)
-    (windowclass-inputonly 2))))
-
-(define cw (enum '((cw-backpixmap 1)
-    (cw-backpixel 2)
-    (cw-borderpixmap 4)
-    (cw-borderpixel 8)
-    (cw-bitgravity 16)
-    (cw-wingravity 32)
-    (cw-backingstore 64)
-    (cw-backingplanes 128)
-    (cw-backingpixel 256)
-    (cw-overrideredirect 512)
-    (cw-saveunder 1024)
-    (cw-eventmask 2048)
-    (cw-dontpropagate 4096)
-    (cw-colormap 8192)
-    (cw-cursor 16384))))
-
-(define backpixmap (enum '((backpixmap-none 0)
-    (backpixmap-parentrelative 1))))
-
-(define gravity (enum '((gravity-bitforget 0)
-    (gravity-winunmap 0)
-    (gravity-northwest 1)
-    (gravity-north 2)
-    (gravity-northeast 3)
-    (gravity-west 4)
-    (gravity-center 5)
-    (gravity-east 6)
-    (gravity-southwest 7)
-    (gravity-south 8)
-    (gravity-southeast 9)
-    (gravity-static 10))))
+(define mapping (enum
+  '((mapping-modifier 0)
+  (mapping-keyboard 0)
+  (mapping-pointer 1))))
+(define mappingnotify-number 34)
+(define-ftype mappingnotify
+    (struct
+    [pad0 (array 1 unsigned-8)]
+    [request-enum unsigned-8]
+    [first_keycode unsigned-8]
+    [count unsigned-8]
+    [pad1 (array 1 unsigned-8)]))
+(define gegeneric-number 35)
+(define-ftype gegeneric
+    (struct
+    [pad2 (array 22 unsigned-8)]))
+(define request-error-number 1)
+(define-ftype request-error
+  (struct
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]
+   [bad_value unsigned-32]
+    [minor_opcode unsigned-16]
+    [major_opcode unsigned-8]
+    [pad3 (array 1 unsigned-8)]))
+(define value-error-number 2)
+(define-ftype value-error
+  (struct
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]
+   [bad_value unsigned-32]
+    [minor_opcode unsigned-16]
+    [major_opcode unsigned-8]
+    [pad4 (array 1 unsigned-8)]))
+(define windowclass (enum
+  '((windowclass-copyfromparent 0)
+  (windowclass-inputoutput 0)
+  (windowclass-inputonly 1))))
+(define cw (enum
+  '((cw-backpixmap 1)
+  (cw-backpixel 1)
+  (cw-borderpixmap 2)
+  (cw-borderpixel 4)
+  (cw-bitgravity 8)
+  (cw-wingravity 16)
+  (cw-backingstore 32)
+  (cw-backingplanes 64)
+  (cw-backingpixel 128)
+  (cw-overrideredirect 256)
+  (cw-saveunder 512)
+  (cw-eventmask 1024)
+  (cw-dontpropagate 2048)
+  (cw-colormap 4096)
+  (cw-cursor 8192))))
+(define backpixmap (enum
+  '((backpixmap-none 0)
+  (backpixmap-parentrelative 0))))
+(define gravity (enum
+  '((gravity-bitforget 0)
+  (gravity-winunmap 0)
+  (gravity-northwest 0)
+  (gravity-north 1)
+  (gravity-northeast 2)
+  (gravity-west 3)
+  (gravity-center 4)
+  (gravity-east 5)
+  (gravity-southwest 6)
+  (gravity-south 7)
+  (gravity-southeast 8)
+  (gravity-static 9))))
 (define createwindow-opcode 1)
 (define-ftype createwindow
   (struct
@@ -502,10 +791,10 @@
    [response-type unsigned-8]
    [error-code unsigned-8]
    [sequence unsigned-16]))
-
-(define mapstate (enum '((mapstate-unmapped 0)
-    (mapstate-unviewable 1)
-    (mapstate-viewable 2))))
+(define mapstate (enum
+  '((mapstate-unmapped 0)
+  (mapstate-unviewable 0)
+  (mapstate-viewable 1))))
 (define getwindowattributes-opcode 3)
 (define-ftype getwindowattributes
   (struct
@@ -557,9 +846,9 @@
   (struct
     [pad0 (array 1 unsigned-8)]
     [window unsigned-32]))
-
-(define setmode (enum '((setmode-insert 0)
-    (setmode-delete 1))))
+(define setmode (enum
+  '((setmode-insert 0)
+  (setmode-delete 0))))
 (define changesaveset-opcode 6)
 (define-ftype changesaveset
   (struct
@@ -635,20 +924,20 @@
   (struct
     [pad0 (array 1 unsigned-8)]
     [window unsigned-32]))
-
-(define configwindow (enum '((configwindow-x 1)
-    (configwindow-y 2)
-    (configwindow-width 4)
-    (configwindow-height 8)
-    (configwindow-borderwidth 16)
-    (configwindow-sibling 32)
-    (configwindow-stackmode 64))))
-
-(define stackmode (enum '((stackmode-above 0)
-    (stackmode-below 1)
-    (stackmode-topif 2)
-    (stackmode-bottomif 3)
-    (stackmode-opposite 4))))
+(define configwindow (enum
+  '((configwindow-x 1)
+  (configwindow-y 1)
+  (configwindow-width 2)
+  (configwindow-height 4)
+  (configwindow-borderwidth 8)
+  (configwindow-sibling 16)
+  (configwindow-stackmode 32))))
+(define stackmode (enum
+  '((stackmode-above 0)
+  (stackmode-below 0)
+  (stackmode-topif 1)
+  (stackmode-bottomif 2)
+  (stackmode-opposite 3))))
 (define configurewindow-opcode 12)
 (define-ftype configurewindow
   (struct
@@ -684,9 +973,9 @@
    [response-type unsigned-8]
    [error-code unsigned-8]
    [sequence unsigned-16]))
-
-(define circulate (enum '((circulate-raiselowest 0)
-    (circulate-lowerhighest 1))))
+(define circulate (enum
+  '((circulate-raiselowest 0)
+  (circulate-lowerhighest 0))))
 (define circulatewindow-opcode 13)
 (define-ftype circulatewindow
   (struct
@@ -778,10 +1067,10 @@
     [name_len unsigned-16]
     [pad1 (array 22 unsigned-8)]
     [name (* unsigned-8)]))
-
-(define propmode (enum '((propmode-replace 0)
-    (propmode-prepend 1)
-    (propmode-append 2))))
+(define propmode (enum
+  '((propmode-replace 0)
+  (propmode-prepend 0)
+  (propmode-append 1))))
 (define changeproperty-opcode 18)
 (define-ftype changeproperty
   (struct
@@ -829,8 +1118,8 @@
     [pad0 (array 1 unsigned-8)]
     [window unsigned-32]
     [property unsigned-32]))
-
-(define getpropertytype (enum '((getpropertytype-any 0))))
+(define getpropertytype (enum
+  '((getpropertytype-any 0))))
 (define getproperty-opcode 20)
 (define-ftype getproperty
   (struct
@@ -914,9 +1203,9 @@
     [target unsigned-32]
     [property unsigned-32]
     [time unsigned-32]))
-
-(define sendeventdest (enum '((sendeventdest-pointerwindow 0)
-    (sendeventdest-itemfocus 1))))
+(define sendeventdest (enum
+  '((sendeventdest-pointerwindow 0)
+  (sendeventdest-itemfocus 0))))
 (define sendevent-opcode 25)
 (define-ftype sendevent
   (struct
@@ -936,17 +1225,17 @@
    [response-type unsigned-8]
    [error-code unsigned-8]
    [sequence unsigned-16]))
-
-(define grabmode (enum '((grabmode-sync 0)
-    (grabmode-async 1))))
-
-(define grabstatus (enum '((grabstatus-success 0)
-    (grabstatus-alreadygrabbed 1)
-    (grabstatus-invalidtime 2)
-    (grabstatus-notviewable 3)
-    (grabstatus-frozen 4))))
-
-(define cursor (enum '((cursor-none 0))))
+(define grabmode (enum
+  '((grabmode-sync 0)
+  (grabmode-async 0))))
+(define grabstatus (enum
+  '((grabstatus-success 0)
+  (grabstatus-alreadygrabbed 0)
+  (grabstatus-invalidtime 1)
+  (grabstatus-notviewable 2)
+  (grabstatus-frozen 3))))
+(define cursor (enum
+  '((cursor-none 0))))
 (define grabpointer-opcode 26)
 (define-ftype grabpointer
   (struct
@@ -978,13 +1267,13 @@
   (struct
     [pad0 (array 1 unsigned-8)]
     [time unsigned-32]))
-
-(define buttonindex (enum '((buttonindex-any 0)
-    (buttonindex-1 1)
-    (buttonindex-2 2)
-    (buttonindex-3 3)
-    (buttonindex-4 4)
-    (buttonindex-5 5))))
+(define buttonindex (enum
+  '((buttonindex-any 0)
+  (buttonindex-1 0)
+  (buttonindex-2 1)
+  (buttonindex-3 2)
+  (buttonindex-4 3)
+  (buttonindex-5 4))))
 (define grabbutton-opcode 28)
 (define-ftype grabbutton
   (struct
@@ -1066,8 +1355,8 @@
   (struct
     [pad0 (array 1 unsigned-8)]
     [time unsigned-32]))
-
-(define grab (enum '((grab-any 0))))
+(define grab (enum
+  '((grab-any 0))))
 (define grabkey-opcode 33)
 (define-ftype grabkey
   (struct
@@ -1115,15 +1404,15 @@
    [response-type unsigned-8]
    [error-code unsigned-8]
    [sequence unsigned-16]))
-
-(define allow (enum '((allow-asyncpointer 0)
-    (allow-syncpointer 1)
-    (allow-replaypointer 2)
-    (allow-asynckeyboard 3)
-    (allow-synckeyboard 4)
-    (allow-replaykeyboard 5)
-    (allow-asyncboth 6)
-    (allow-syncboth 7))))
+(define allow (enum
+  '((allow-asyncpointer 0)
+  (allow-syncpointer 0)
+  (allow-replaypointer 1)
+  (allow-asynckeyboard 2)
+  (allow-synckeyboard 3)
+  (allow-replaykeyboard 4)
+  (allow-asyncboth 5)
+  (allow-syncboth 6))))
 (define allowevents-opcode 35)
 (define-ftype allowevents
   (struct
@@ -1217,11 +1506,11 @@
    [response-type unsigned-8]
    [error-code unsigned-8]
    [sequence unsigned-16]))
-
-(define inputfocus (enum '((inputfocus-none 0)
-    (inputfocus-pointerroot 1)
-    (inputfocus-parent 2)
-    (inputfocus-followkeyboard 3))))
+(define inputfocus (enum
+  '((inputfocus-none 0)
+  (inputfocus-pointerroot 0)
+  (inputfocus-parent 1)
+  (inputfocus-followkeyboard 2))))
 (define setinputfocus-opcode 42)
 (define-ftype setinputfocus
   (struct
@@ -1273,9 +1562,9 @@
   (struct
     [pad0 (array 1 unsigned-8)]
     [font unsigned-32]))
-
-(define fontdraw (enum '((fontdraw-lefttoright 0)
-    (fontdraw-righttoleft 1))))
+(define fontdraw (enum
+  '((fontdraw-lefttoright 0)
+  (fontdraw-righttoleft 0))))
 (define-ftype fontprop
   (struct
     [name unsigned-32]
@@ -1435,74 +1724,74 @@
    [response-type unsigned-8]
    [error-code unsigned-8]
    [sequence unsigned-16]))
-
-(define gc (enum '((gc-function 1)
-    (gc-planemask 2)
-    (gc-foreground 4)
-    (gc-background 8)
-    (gc-linewidth 16)
-    (gc-linestyle 32)
-    (gc-capstyle 64)
-    (gc-joinstyle 128)
-    (gc-fillstyle 256)
-    (gc-fillrule 512)
-    (gc-tile 1024)
-    (gc-stipple 2048)
-    (gc-tilestippleoriginx 4096)
-    (gc-tilestippleoriginy 8192)
-    (gc-font 16384)
-    (gc-subwindowmode 32768)
-    (gc-graphicsexposures 65536)
-    (gc-cliporiginx 131072)
-    (gc-cliporiginy 262144)
-    (gc-clipmask 524288)
-    (gc-dashoffset 1048576)
-    (gc-dashlist 2097152)
-    (gc-arcmode 4194304))))
-
-(define gx (enum '((gx-clear 0)
-    (gx-and 1)
-    (gx-andreverse 2)
-    (gx-copy 3)
-    (gx-andinverted 4)
-    (gx-noop 5)
-    (gx-xor 6)
-    (gx-or 7)
-    (gx-nor 8)
-    (gx-equiv 9)
-    (gx-invert 10)
-    (gx-orreverse 11)
-    (gx-copyinverted 12)
-    (gx-orinverted 13)
-    (gx-nand 14)
-    (gx-set 15))))
-
-(define linestyle (enum '((linestyle-solid 0)
-    (linestyle-onoffdash 1)
-    (linestyle-doubledash 2))))
-
-(define capstyle (enum '((capstyle-notlast 0)
-    (capstyle-butt 1)
-    (capstyle-round 2)
-    (capstyle-projecting 3))))
-
-(define joinstyle (enum '((joinstyle-miter 0)
-    (joinstyle-round 1)
-    (joinstyle-bevel 2))))
-
-(define fillstyle (enum '((fillstyle-solid 0)
-    (fillstyle-tiled 1)
-    (fillstyle-stippled 2)
-    (fillstyle-opaquestippled 3))))
-
-(define fillrule (enum '((fillrule-evenodd 0)
-    (fillrule-winding 1))))
-
-(define subwindowmode (enum '((subwindowmode-clipbychildren 0)
-    (subwindowmode-includeinferiors 1))))
-
-(define arcmode (enum '((arcmode-chord 0)
-    (arcmode-pieslice 1))))
+(define gc (enum
+  '((gc-function 1)
+  (gc-planemask 1)
+  (gc-foreground 2)
+  (gc-background 4)
+  (gc-linewidth 8)
+  (gc-linestyle 16)
+  (gc-capstyle 32)
+  (gc-joinstyle 64)
+  (gc-fillstyle 128)
+  (gc-fillrule 256)
+  (gc-tile 512)
+  (gc-stipple 1024)
+  (gc-tilestippleoriginx 2048)
+  (gc-tilestippleoriginy 4096)
+  (gc-font 8192)
+  (gc-subwindowmode 16384)
+  (gc-graphicsexposures 32768)
+  (gc-cliporiginx 65536)
+  (gc-cliporiginy 131072)
+  (gc-clipmask 262144)
+  (gc-dashoffset 524288)
+  (gc-dashlist 1048576)
+  (gc-arcmode 2097152))))
+(define gx (enum
+  '((gx-clear 0)
+  (gx-and 0)
+  (gx-andreverse 1)
+  (gx-copy 2)
+  (gx-andinverted 3)
+  (gx-noop 4)
+  (gx-xor 5)
+  (gx-or 6)
+  (gx-nor 7)
+  (gx-equiv 8)
+  (gx-invert 9)
+  (gx-orreverse 10)
+  (gx-copyinverted 11)
+  (gx-orinverted 12)
+  (gx-nand 13)
+  (gx-set 14))))
+(define linestyle (enum
+  '((linestyle-solid 0)
+  (linestyle-onoffdash 0)
+  (linestyle-doubledash 1))))
+(define capstyle (enum
+  '((capstyle-notlast 0)
+  (capstyle-butt 0)
+  (capstyle-round 1)
+  (capstyle-projecting 2))))
+(define joinstyle (enum
+  '((joinstyle-miter 0)
+  (joinstyle-round 0)
+  (joinstyle-bevel 1))))
+(define fillstyle (enum
+  '((fillstyle-solid 0)
+  (fillstyle-tiled 0)
+  (fillstyle-stippled 1)
+  (fillstyle-opaquestippled 2))))
+(define fillrule (enum
+  '((fillrule-evenodd 0)
+  (fillrule-winding 0))))
+(define subwindowmode (enum
+  '((subwindowmode-clipbychildren 0)
+  (subwindowmode-includeinferiors 0))))
+(define arcmode (enum
+  '((arcmode-chord 0)
+  (arcmode-pieslice 0))))
 (define creategc-opcode 55)
 (define-ftype creategc
   (struct
@@ -1655,11 +1944,11 @@
     [dash_offset unsigned-16]
     [dashes_len unsigned-16]
     [dashes (* unsigned-8)]))
-
-(define clipordering (enum '((clipordering-unsorted 0)
-    (clipordering-ysorted 1)
-    (clipordering-yxsorted 2)
-    (clipordering-yxbanded 3))))
+(define clipordering (enum
+  '((clipordering-unsorted 0)
+  (clipordering-ysorted 0)
+  (clipordering-yxsorted 1)
+  (clipordering-yxbanded 2))))
 (define setcliprectangles-opcode 59)
 (define-ftype setcliprectangles
   (struct
@@ -1733,9 +2022,9 @@
     [width unsigned-16]
     [height unsigned-16]
     [bit_plane unsigned-32]))
-
-(define coordmode (enum '((coordmode-origin 0)
-    (coordmode-previous 1))))
+(define coordmode (enum
+  '((coordmode-origin 0)
+  (coordmode-previous 0))))
 (define polypoint-opcode 64)
 (define-ftype polypoint
   (struct
@@ -1819,10 +2108,10 @@
     [drawable unsigned-32]
     [gc unsigned-32]
     [arcs arc]))
-
-(define polyshape (enum '((polyshape-complex 0)
-    (polyshape-nonconvex 1)
-    (polyshape-convex 2))))
+(define polyshape (enum
+  '((polyshape-complex 0)
+  (polyshape-nonconvex 0)
+  (polyshape-convex 1))))
 (define fillpoly-opcode 69)
 (define-ftype fillpoly
   (struct
@@ -1865,10 +2154,10 @@
     [drawable unsigned-32]
     [gc unsigned-32]
     [arcs arc]))
-
-(define imageformat (enum '((imageformat-xybitmap 0)
-    (imageformat-xypixmap 1)
-    (imageformat-zpixmap 2))))
+(define imageformat (enum
+  '((imageformat-xybitmap 0)
+  (imageformat-xypixmap 0)
+  (imageformat-zpixmap 1))))
 (define putimage-opcode 72)
 (define-ftype putimage
   (struct
@@ -1971,9 +2260,9 @@
    [response-type unsigned-8]
    [error-code unsigned-8]
    [sequence unsigned-16]))
-
-(define colormapalloc (enum '((colormapalloc-none 0)
-    (colormapalloc-all 1))))
+(define colormapalloc (enum
+  '((colormapalloc-none 0)
+  (colormapalloc-all 0))))
 (define createcolormap-opcode 78)
 (define-ftype createcolormap
   (struct
@@ -2095,10 +2384,10 @@
     [cmap unsigned-32]
     [plane_mask unsigned-32]
     [pixels unsigned-32]))
-
-(define colorflag (enum '((colorflag-red 1)
-    (colorflag-green 2)
-    (colorflag-blue 4))))
+(define colorflag (enum
+  '((colorflag-red 1)
+  (colorflag-green 1)
+  (colorflag-blue 2))))
 (define-ftype coloritem
   (struct
     [pixel unsigned-32]
@@ -2157,8 +2446,8 @@
     [visual_red unsigned-16]
     [visual_green unsigned-16]
     [visual_blue unsigned-16]))
-
-(define pixmap (enum '((pixmap-none 0))))
+(define pixmap (enum
+  '((pixmap-none 0))))
 (define createcursor-opcode 93)
 (define-ftype createcursor
   (struct
@@ -2174,8 +2463,8 @@
     [back_blue unsigned-16]
     [x unsigned-16]
     [y unsigned-16]))
-
-(define font (enum '((font-none 0))))
+(define font (enum
+  '((font-none 0))))
 (define createglyphcursor-opcode 94)
 (define-ftype createglyphcursor
   (struct
@@ -2231,10 +2520,10 @@
     [back_red unsigned-16]
     [back_green unsigned-16]
     [back_blue unsigned-16]))
-
-(define queryshapeof (enum '((queryshapeof-largestcursor 0)
-    (queryshapeof-fastesttile 1)
-    (queryshapeof-fasteststipple 2))))
+(define queryshapeof (enum
+  '((queryshapeof-largestcursor 0)
+  (queryshapeof-fastesttile 0)
+  (queryshapeof-fasteststipple 1))))
 (define querybestsize-opcode 97)
 (define-ftype querybestsize
   (struct
@@ -2285,22 +2574,22 @@
     [keysyms_per_keycode unsigned-8]
     [pad0 (array 24 unsigned-8)]
     [keysyms (* unsigned-32)]))
-
-(define kb (enum '((kb-keyclickpercent 1)
-    (kb-bellpercent 2)
-    (kb-bellpitch 4)
-    (kb-bellduration 8)
-    (kb-led 16)
-    (kb-ledmode 32)
-    (kb-key 64)
-    (kb-autorepeatmode 128))))
-
-(define ledmode (enum '((ledmode-off 0)
-    (ledmode-on 1))))
-
-(define autorepeatmode (enum '((autorepeatmode-off 0)
-    (autorepeatmode-on 1)
-    (autorepeatmode-default 2))))
+(define kb (enum
+  '((kb-keyclickpercent 1)
+  (kb-bellpercent 1)
+  (kb-bellpitch 2)
+  (kb-bellduration 4)
+  (kb-led 8)
+  (kb-ledmode 16)
+  (kb-key 32)
+  (kb-autorepeatmode 64))))
+(define ledmode (enum
+  '((ledmode-off 0)
+  (ledmode-on 0))))
+(define autorepeatmode (enum
+  '((autorepeatmode-off 0)
+  (autorepeatmode-on 0)
+  (autorepeatmode-default 1))))
 (define changekeyboardcontrol-opcode 102)
 (define-ftype changekeyboardcontrol
   (struct
@@ -2347,14 +2636,14 @@
     [acceleration_denominator unsigned-16]
     [threshold unsigned-16]
     [pad1 (array 18 unsigned-8)]))
-
-(define blanking (enum '((blanking-notpreferred 0)
-    (blanking-preferred 1)
-    (blanking-default 2))))
-
-(define exposures (enum '((exposures-notallowed 0)
-    (exposures-allowed 1)
-    (exposures-default 2))))
+(define blanking (enum
+  '((blanking-notpreferred 0)
+  (blanking-preferred 0)
+  (blanking-default 1))))
+(define exposures (enum
+  '((exposures-notallowed 0)
+  (exposures-allowed 0)
+  (exposures-default 1))))
 (define setscreensaver-opcode 107)
 (define-ftype setscreensaver
   (struct
@@ -2371,15 +2660,15 @@
     [prefer_blanking-enum unsigned-8]
     [allow_exposures-enum unsigned-8]
     [pad1 (array 18 unsigned-8)]))
-
-(define hostmode (enum '((hostmode-insert 0)
-    (hostmode-delete 1))))
-
-(define family (enum '((family-internet 0)
-    (family-decnet 1)
-    (family-chaos 2)
-    (family-serverinterpreted 5)
-    (family-internet6 6))))
+(define hostmode (enum
+  '((hostmode-insert 0)
+  (hostmode-delete 0))))
+(define family (enum
+  '((family-internet 0)
+  (family-decnet 0)
+  (family-chaos 1)
+  (family-serverinterpreted 2)
+  (family-internet6 5))))
 (define changehosts-opcode 109)
 (define-ftype changehosts
   (struct
@@ -2401,23 +2690,23 @@
     [hosts_len unsigned-16]
     [pad0 (array 22 unsigned-8)]
     [hosts (* host)]))
-
-(define accesscontrol (enum '((accesscontrol-disable 0)
-    (accesscontrol-enable 1))))
+(define accesscontrol (enum
+  '((accesscontrol-disable 0)
+  (accesscontrol-enable 0))))
 (define setaccesscontrol-opcode 111)
 (define-ftype setaccesscontrol
   (struct
     [mode-enum unsigned-8]))
-
-(define closedown (enum '((closedown-destroyall 0)
-    (closedown-retainpermanent 1)
-    (closedown-retaintemporary 2))))
+(define closedown (enum
+  '((closedown-destroyall 0)
+  (closedown-retainpermanent 0)
+  (closedown-retaintemporary 1))))
 (define setclosedownmode-opcode 112)
 (define-ftype setclosedownmode
   (struct
     [mode-enum unsigned-8]))
-
-(define kill (enum '((kill-alltemporary 0))))
+(define kill (enum
+  '((kill-alltemporary 0))))
 (define killclient-opcode 113)
 (define-ftype killclient
   (struct
@@ -2437,17 +2726,17 @@
     [atoms_len unsigned-16]
     [delta integer-16]
     [atoms (* unsigned-32)]))
-
-(define screensaver (enum '((screensaver-reset 0)
-    (screensaver-active 1))))
+(define screensaver (enum
+  '((screensaver-reset 0)
+  (screensaver-active 0))))
 (define forcescreensaver-opcode 115)
 (define-ftype forcescreensaver
   (struct
     [mode-enum unsigned-8]))
-
-(define mappingstatus (enum '((mappingstatus-success 0)
-    (mappingstatus-busy 1)
-    (mappingstatus-failure 2))))
+(define mappingstatus (enum
+  '((mappingstatus-success 0)
+  (mappingstatus-busy 0)
+  (mappingstatus-failure 1))))
 (define setpointermapping-opcode 116)
 (define-ftype setpointermapping
   (struct
@@ -2461,15 +2750,15 @@
     [map_len unsigned-8]
     [pad0 (array 24 unsigned-8)]
     [map (* unsigned-8)]))
-
-(define mapindex (enum '((mapindex-shift 0)
-    (mapindex-lock 1)
-    (mapindex-control 2)
-    (mapindex-1 3)
-    (mapindex-2 4)
-    (mapindex-3 5)
-    (mapindex-4 6)
-    (mapindex-5 7))))
+(define mapindex (enum
+  '((mapindex-shift 0)
+  (mapindex-lock 0)
+  (mapindex-control 1)
+  (mapindex-1 2)
+  (mapindex-2 3)
+  (mapindex-3 4)
+  (mapindex-4 5)
+  (mapindex-5 6))))
 (define setmodifiermapping-opcode 118)
 (define-ftype setmodifiermapping
   (struct

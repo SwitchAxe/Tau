@@ -16,7 +16,7 @@
           (reverse zs)
           (loop (- n 1) (cdr xs)
 		(cons (car xs) zs)))))
-
+  
 
   (define (skip-docs l struct-tagl skip-tagl)
     (cond
@@ -157,8 +157,14 @@
 					   (safestring
 					    (cadr current-node))))]
 				   (cond
+				    [(member t uint8s) 'unsigned-8]
 				    [(member t uint32s) 'unsigned-32]
-				    [(member t uint8s) 'unsigned-8]))
+				    [(member t int16s) 'integer-16]
+				    [(equal? t 'bool) 'boolean]
+				    [(member t uint16s) 'unsigned-16]
+				    [(member t int32s) 'integer-32]
+				    [(member t int8s) 'integer-8]
+				    [else (symbol->string t)]))
 				 (if (not (assoc 'type (list (cadr l))))
 				     "))\n"
 				     "\n    ")))
@@ -203,57 +209,101 @@
 	    (set! int8s (cons nt int8s))]))
 	(list->code-aux port (if (not (null? l)) (cdr l) '())
 			(if (null? (cdr l)) '() (cadr l)) "" #f 0 list-stack)]
+       ;; [(equal? (car current-node) 'enum)
+       ;; 	(let [(enum-name (safestring (cadr (assoc 'name (cdr current-node)))))]
+       ;;    (put-string port
+       ;;                (format
+       ;;                 "\n(define ~s (enum "
+       ;;                 (string->symbol enum-name)))
+       ;;    (let loop [(enuml '()) (lc (cdr l)) (idx 0)]
+       ;;      (cond
+       ;;       [(member (caar lc) struct-xml-tags)
+       ;;        (put-string port (format "'(~s"
+       ;; 				       (car enuml)))
+       ;; 	      (if (= (length enuml) 1)
+       ;; 		  (begin
+       ;; 		    (put-string port ")))\n")
+       ;; 		    (list->code-aux port lc (car lc) "" #f 0 list-stack))
+       ;; 		  (let inner [(enuml-cp (cdr enuml)) (elem (cadr enuml))]
+       ;; 		    (cond
+       ;; 		     [(null? (cdr enuml-cp))
+       ;; 		      (put-string port (format "\n    ~s)))\n" (car enuml-cp)))
+       ;; 		      (list->code-aux port lc (car lc) "" #f 0 list-stack)]
+       ;; 		     [(null? enuml-cp)
+       ;; 		      (put-string port (format "\n    ~s)))\n" elem))
+       ;; 		      (list->code-aux port lc (car lc) "" #f 0 list-stack)]
+       ;; 		     [else
+       ;; 		      (put-string port (format "\n    ~s" elem))
+       ;; 		      (inner (cdr enuml-cp) (if (null? (cdr enuml-cp))
+       ;; 						(car enuml-cp)
+       ;; 						(cadr enuml-cp)))])))]
+       ;;       [(equal? (caar lc) 'item)
+       ;;        (loop
+       ;;         (add
+       ;; 		(add
+       ;; 		 (cond
+       ;;            [(equal? (caadr lc) 'value)
+       ;;             (string->number (cadadr lc))]
+       ;;            [(equal? (caadr lc) 'bit)
+       ;;             (<< 1 (string->number (cadadr lc)))])
+       ;; 		 (string->symbol
+       ;;            (string-append
+       ;;             enum-name
+       ;;             "-"
+       ;;             (safestring
+       ;;              (cadr
+       ;;               (assoc
+       ;;                'name
+       ;;                (cdar lc)))))))
+       ;; 		enuml)
+       ;;         (cddr lc)
+       ;;         idx)]
+       ;;       [else
+       ;;        (loop enuml (cdr lc) (+ 1 idx))])))]
        [(equal? (car current-node) 'enum)
-	(let [(enum-name (safestring (cadr (assoc 'name (cdr current-node)))))]
-          (put-string port
-                      (format
-                       "\n(define ~s (enum "
-                       (string->symbol enum-name)))
-          (let loop [(enuml '()) (lc (cdr l)) (idx 0)]
-            (cond
-             [(member (caar lc) (append data-structures '(switch enum request reply)))
-              (put-string port (format "'(~s"
-				       (car enuml)))
-	      (if (= (length enuml) 1)
-		  (begin
-		    (put-string port ")))\n")
-		    (list->code-aux port lc (car lc) "" #f 0 list-stack))
-		  (let inner [(enuml-cp (cdr enuml)) (elem (cadr enuml))]
-		    (cond
-		     [(null? (cdr enuml-cp))
-		      (put-string port (format "\n    ~s)))\n" (car enuml-cp)))
-		      (list->code-aux port lc (car lc) "" #f 0 list-stack)]
-		     [(null? enuml-cp)
-		      (put-string port (format "\n    ~s)))\n" elem))
-		      (list->code-aux port lc (car lc) "" #f 0 list-stack)]
-		     [else
-		      (put-string port (format "\n    ~s" elem))
-		      (inner (cdr enuml-cp) (if (null? (cdr enuml-cp))
-						(car enuml-cp)
-						(cadr enuml-cp)))])))]
-             [(equal? (caar lc) 'item)
-              (loop
-               (add
-		(add
-		 (cond
-                  [(equal? (caadr lc) 'value)
-                   (string->number (cadadr lc))]
-                  [(equal? (caadr lc) 'bit)
-                   (<< 1 (string->number (cadadr lc)))])
-		 (string->symbol
-                  (string-append
-                   enum-name
-                   "-"
-                   (safestring
-                    (cadr
-                     (assoc
-                      'name
-                      (cdar lc)))))))
-		enuml)
-               (cddr lc)
-               idx)]
-             [else
-              (loop enuml (cdr lc) (+ 1 idx))])))]
+	(let [(enum-name (safestring
+			  (cadr (assoc 'name (cdr current-node)))))]
+	  (put-string port (format "(define ~a (enum\n  '("
+				   enum-name))
+	  (let loop [(lc (cdr l)) (idx 0)
+		     (item-name (safestring (cadr (assoc 'name (cdadr l)))))
+		     (item-number (cond [(equal? (caaddr l) 'value)
+					 (string->number (cadadr (cdr l)))]
+					[(equal? (caaddr l) 'bit)
+					 (<< 1 (string->number (cadadr (cdr l))))]
+					[else 0]))]
+	    (cond
+	     [(equal? (caar lc) 'item)
+	      (put-string port (format "(~a ~a)~a"
+				       (string->symbol
+					(string-append
+				         enum-name
+					 "-"
+					 item-name))
+				       item-number
+				       (if (equal? (caaddr lc) 'item)
+					   "\n  "
+					   ")))\n")))
+	      (loop
+	       (if (member (caadr lc) '(value bit))
+		   (cddr lc)
+		   (cdr lc))
+	       idx
+	       (if (equal? (caaddr lc) 'item)
+		   (safestring (cadr (assoc 'name (cdaddr lc))))
+		   #f)
+	       (if (equal? (caaddr lc) 'item)
+		   (cond [(equal? (caadr lc) 'value)
+			  (string->number (cadadr lc))]
+			 [(equal? (caadr lc) 'bit)
+			  (<< 1 (string->number (cadadr lc)))]
+			 [else idx])
+		   #f))]
+	     [else
+	      (list->code-aux port lc
+			      (if (null? lc)
+				  '() (car lc))
+			      "" #f 0 list-stack)])))]
        [(member (car current-node) '(field exprfield))
 	(if (< (length (cdr current-node)) 2)
 	    (list->code-aux port (if (not (null? l)) (cdr l) '())

@@ -1,10 +1,6 @@
 (import (generate)
 	(parse))
 
-(define xml (prepare-xml "src/xml/render.xml"))
-(display xml)
-(newline)
-
 (for-each
  (lambda (f)
    (define xml (prepare-xml (string-append "src/xml/" f)))
