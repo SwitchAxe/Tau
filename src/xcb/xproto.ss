@@ -1,4 +1,4 @@
-(load "enum.ss")
+(import (enums))
 (define-ftype char2b
   (struct
     [byte1 unsigned-8]
@@ -380,97 +380,62 @@
   (struct
     [BackPixmap unsigned-32]
     [background_pixmap unsigned-32]
-    [BackPixel unsigned-32]
     [background_pixel unsigned-32]
-    [BorderPixmap unsigned-32]
     [border_pixmap unsigned-32]
-    [BorderPixel unsigned-32]
     [border_pixel unsigned-32]
-    [BitGravity unsigned-32]
     [bit_gravity-enum unsigned-32]
-    [WinGravity unsigned-32]
     [win_gravity-enum unsigned-32]
-    [BackingStore unsigned-32]
     [backing_store-enum unsigned-32]
-    [BackingPlanes unsigned-32]
     [backing_planes unsigned-32]
-    [BackingPixel unsigned-32]
     [backing_pixel unsigned-32]
-    [OverrideRedirect unsigned-32]
     [override_redirect unsigned-32]
-    [SaveUnder unsigned-32]
     [save_under unsigned-32]
-    [EventMask unsigned-32]
     [event_mask-mask unsigned-32]
-    [DontPropagate unsigned-32]
     [do_not_propogate_mask-mask unsigned-32]
-    [Colormap unsigned-32]
     [colormap unsigned-32]
-    [Cursor unsigned-32]
     [cursor unsigned-32]))
+
 (define-ftype colormap-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype match-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype cursor-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype pixmap-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype value-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype window-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype alloc-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define changewindowattributes-opcode 2)
 (define-ftype changewindowattributes
   (struct
@@ -481,97 +446,62 @@
   (struct
     [BackPixmap unsigned-32]
     [background_pixmap unsigned-32]
-    [BackPixel unsigned-32]
     [background_pixel unsigned-32]
-    [BorderPixmap unsigned-32]
     [border_pixmap unsigned-32]
-    [BorderPixel unsigned-32]
     [border_pixel unsigned-32]
-    [BitGravity unsigned-32]
     [bit_gravity-enum unsigned-32]
-    [WinGravity unsigned-32]
     [win_gravity-enum unsigned-32]
-    [BackingStore unsigned-32]
     [backing_store-enum unsigned-32]
-    [BackingPlanes unsigned-32]
     [backing_planes unsigned-32]
-    [BackingPixel unsigned-32]
     [backing_pixel unsigned-32]
-    [OverrideRedirect unsigned-32]
     [override_redirect unsigned-32]
-    [SaveUnder unsigned-32]
     [save_under unsigned-32]
-    [EventMask unsigned-32]
     [event_mask-mask unsigned-32]
-    [DontPropagate unsigned-32]
     [do_not_propogate_mask-mask unsigned-32]
-    [Colormap unsigned-32]
     [colormap unsigned-32]
-    [Cursor unsigned-32]
     [cursor unsigned-32]))
+
 (define-ftype access-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype colormap-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype cursor-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype match-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype pixmap-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype value-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype window-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 
 (define mapstate (enum '((mapstate-unmapped 0)
     (mapstate-unviewable 1)
@@ -599,38 +529,29 @@
     [your_event_mask-mask unsigned-32]
     [do_not_propagate_mask-mask unsigned-16]
     [pad0 (array 2 unsigned-8)]))
+
 (define-ftype window-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype drawable-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define destroywindow-opcode 4)
 (define-ftype destroywindow
   (struct
     [pad0 (array 1 unsigned-8)]
     [window unsigned-32]))
+
 (define-ftype window-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define destroysubwindows-opcode 5)
 (define-ftype destroysubwindows
   (struct
@@ -644,33 +565,24 @@
   (struct
     [mode-enum unsigned-8]
     [window unsigned-32]))
+
 (define-ftype match-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype value-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype window-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define reparentwindow-opcode 7)
 (define-ftype reparentwindow
   (struct
@@ -679,38 +591,29 @@
     [parent unsigned-32]
     [x integer-16]
     [y integer-16]))
+
 (define-ftype match-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype window-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define mapwindow-opcode 8)
 (define-ftype mapwindow
   (struct
     [pad0 (array 1 unsigned-8)]
     [window unsigned-32]))
+
 (define-ftype match-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define mapsubwindows-opcode 9)
 (define-ftype mapsubwindows
   (struct
@@ -721,15 +624,12 @@
   (struct
     [pad0 (array 1 unsigned-8)]
     [window unsigned-32]))
+
 (define-ftype window-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define unmapsubwindows-opcode 11)
 (define-ftype unmapsubwindows
   (struct
@@ -760,45 +660,30 @@
   (struct
     [X unsigned-32]
     [x integer-32]
-    [Y unsigned-32]
     [y integer-32]
-    [Width unsigned-32]
     [width unsigned-32]
-    [Height unsigned-32]
     [height unsigned-32]
-    [BorderWidth unsigned-32]
     [border_width unsigned-32]
-    [Sibling unsigned-32]
     [sibling unsigned-32]
-    [StackMode unsigned-32]
     [stack_mode-enum unsigned-32]))
+
 (define-ftype match-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype window-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype value-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 
 (define circulate (enum '((circulate-raiselowest 0)
     (circulate-lowerhighest 1))))
@@ -807,24 +692,18 @@
   (struct
     [direction-enum unsigned-8]
     [window unsigned-32]))
+
 (define-ftype window-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype value-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define getgeometry-opcode 14)
 (define-ftype getgeometry
   (struct
@@ -840,24 +719,18 @@
     [height unsigned-16]
     [border_width unsigned-16]
     [pad0 (array 2 unsigned-8)]))
+
 (define-ftype drawable-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype window-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define querytree-opcode 15)
 (define-ftype querytree
   (struct
@@ -882,24 +755,18 @@
   (struct
     [pad0 (array 1 unsigned-8)]
     [atom unsigned-32]))
+
 (define-ftype alloc-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype value-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define getatomname-opcode 17)
 (define-ftype getatomname
   (struct
@@ -926,51 +793,36 @@
     [pad0 (array 3 unsigned-8)]
     [data_len unsigned-32]
     [data void*]))
+
 (define-ftype match-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype value-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype window-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype atom-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype alloc-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define deleteproperty-opcode 19)
 (define-ftype deleteproperty
   (struct
@@ -996,33 +848,24 @@
     [value_len unsigned-32]
     [pad0 (array 12 unsigned-8)]
     [value void*]))
+
 (define-ftype window-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype atom-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype value-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define listproperties-opcode 21)
 (define-ftype listproperties
   (struct
@@ -1041,15 +884,12 @@
     [owner unsigned-32]
     [selection unsigned-32]
     [time unsigned-32]))
+
 (define-ftype atom-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define getselectionowner-opcode 23)
 (define-ftype getselectionowner
   (struct
@@ -1059,15 +899,12 @@
   (struct
     [pad0 (array 1 unsigned-8)]
     [owner unsigned-32]))
+
 (define-ftype atom-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define convertselection-opcode 24)
 (define-ftype convertselection
   (struct
@@ -1087,24 +924,18 @@
     [destination unsigned-32]
     [event_mask-mask unsigned-32]
     [event (array 32 (* unsigned-8))]))
+
 (define-ftype window-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype value-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 
 (define grabmode (enum '((grabmode-sync 0)
     (grabmode-async 1))))
@@ -1130,24 +961,18 @@
 (define-ftype grabpointer-reply
   (struct
     [status-enum unsigned-8]))
+
 (define-ftype value-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype window-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define ungrabpointer-opcode 27)
 (define-ftype ungrabpointer
   (struct
@@ -1173,42 +998,30 @@
     [button-enum unsigned-8]
     [pad0 (array 1 unsigned-8)]
     [modifiers-mask unsigned-16]))
+
 (define-ftype access-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype value-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype cursor-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype window-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define ungrabbutton-opcode 29)
 (define-ftype ungrabbutton
   (struct
@@ -1236,24 +1049,18 @@
 (define-ftype grabkeyboard-reply
   (struct
     [status-enum unsigned-8]))
+
 (define-ftype value-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype window-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define ungrabkeyboard-opcode 32)
 (define-ftype ungrabkeyboard
   (struct
@@ -1271,33 +1078,24 @@
     [pointer_mode-enum unsigned-8]
     [keyboard_mode-enum unsigned-8]
     [pad0 (array 3 unsigned-8)]))
+
 (define-ftype access-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype value-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype window-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define ungrabkey-opcode 34)
 (define-ftype ungrabkey
   (struct
@@ -1305,24 +1103,18 @@
     [grab_window unsigned-32]
     [modifiers-mask unsigned-16]
     [pad0 (array 2 unsigned-8)]))
+
 (define-ftype window-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype value-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 
 (define allow (enum '((allow-asyncpointer 0)
     (allow-syncpointer 1)
@@ -1337,15 +1129,12 @@
   (struct
     [mode-enum unsigned-8]
     [time unsigned-32]))
+
 (define-ftype value-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define grabserver-opcode 36)
 (define-ftype grabserver
   (struct
@@ -1372,15 +1161,12 @@
     [win_y integer-16]
     [mask-mask unsigned-16]
     [pad0 (array 2 unsigned-8)]))
+
 (define-ftype window-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define-ftype timecoord
   (struct
     [time unsigned-32]
@@ -1425,15 +1211,12 @@
     [src_height unsigned-16]
     [dst_x integer-16]
     [dst_y integer-16]))
+
 (define-ftype window-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 
 (define inputfocus (enum '((inputfocus-none 0)
     (inputfocus-pointerroot 1)
@@ -1445,33 +1228,24 @@
     [revert_to-enum unsigned-8]
     [focus unsigned-32]
     [time unsigned-32]))
+
 (define-ftype window-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype match-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype value-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define-ftype getinputfocus-reply
   (struct
     [revert_to-enum unsigned-8]
@@ -1488,15 +1262,12 @@
     [name_len unsigned-16]
     [pad1 (array 2 unsigned-8)]
     [name (* unsigned-8)]))
+
 (define-ftype name-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define closefont-opcode 46)
 (define-ftype closefont
   (struct
@@ -1558,24 +1329,18 @@
     [overall_width integer-32]
     [overall_left integer-32]
     [overall_right integer-32]))
+
 (define-ftype gcontext-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype font-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define-ftype str
   (struct
     [name_len unsigned-8]
@@ -1641,47 +1406,35 @@
     [drawable unsigned-32]
     [width unsigned-16]
     [height unsigned-16]))
+
 (define-ftype value-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype drawable-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype alloc-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define freepixmap-opcode 54)
 (define-ftype freepixmap
   (struct
     [pad0 (array 1 unsigned-8)]
     [pixmap unsigned-32]))
+
 (define-ftype pixmap-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 
 (define gc (enum '((gc-function 1)
     (gc-planemask 2)
@@ -1761,104 +1514,64 @@
   (struct
     [Function unsigned-32]
     [function-enum unsigned-32]
-    [PlaneMask unsigned-32]
     [plane_mask unsigned-32]
-    [Foreground unsigned-32]
     [foreground unsigned-32]
-    [Background unsigned-32]
     [background unsigned-32]
-    [LineWidth unsigned-32]
     [line_width unsigned-32]
-    [LineStyle unsigned-32]
     [line_style-enum unsigned-32]
-    [CapStyle unsigned-32]
     [cap_style-enum unsigned-32]
-    [JoinStyle unsigned-32]
     [join_style-enum unsigned-32]
-    [FillStyle unsigned-32]
     [fill_style-enum unsigned-32]
-    [FillRule unsigned-32]
     [fill_rule-enum unsigned-32]
-    [Tile unsigned-32]
     [tile unsigned-32]
-    [Stipple unsigned-32]
     [stipple unsigned-32]
-    [TileStippleOriginX unsigned-32]
     [tile_stipple_x_origin integer-32]
-    [TileStippleOriginY unsigned-32]
     [tile_stipple_y_origin integer-32]
-    [Font unsigned-32]
     [font unsigned-32]
-    [SubwindowMode unsigned-32]
     [subwindow_mode-enum unsigned-32]
-    [GraphicsExposures unsigned-32]
     [graphics_exposures unsigned-32]
-    [ClipOriginX unsigned-32]
     [clip_x_origin integer-32]
-    [ClipOriginY unsigned-32]
     [clip_y_origin integer-32]
-    [ClipMask unsigned-32]
     [clip_mask unsigned-32]
-    [DashOffset unsigned-32]
     [dash_offset unsigned-32]
-    [DashList unsigned-32]
     [dashes unsigned-32]
-    [ArcMode unsigned-32]
     [arc_mode-enum unsigned-32]))
+
 (define-ftype drawable-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype match-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype font-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype pixmap-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype value-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype alloc-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define changegc-opcode 56)
 (define-ftype changegc
   (struct
@@ -1869,104 +1582,64 @@
   (struct
     [Function unsigned-32]
     [function-enum unsigned-32]
-    [PlaneMask unsigned-32]
     [plane_mask unsigned-32]
-    [Foreground unsigned-32]
     [foreground unsigned-32]
-    [Background unsigned-32]
     [background unsigned-32]
-    [LineWidth unsigned-32]
     [line_width unsigned-32]
-    [LineStyle unsigned-32]
     [line_style-enum unsigned-32]
-    [CapStyle unsigned-32]
     [cap_style-enum unsigned-32]
-    [JoinStyle unsigned-32]
     [join_style-enum unsigned-32]
-    [FillStyle unsigned-32]
     [fill_style-enum unsigned-32]
-    [FillRule unsigned-32]
     [fill_rule-enum unsigned-32]
-    [Tile unsigned-32]
     [tile unsigned-32]
-    [Stipple unsigned-32]
     [stipple unsigned-32]
-    [TileStippleOriginX unsigned-32]
     [tile_stipple_x_origin integer-32]
-    [TileStippleOriginY unsigned-32]
     [tile_stipple_y_origin integer-32]
-    [Font unsigned-32]
     [font unsigned-32]
-    [SubwindowMode unsigned-32]
     [subwindow_mode-enum unsigned-32]
-    [GraphicsExposures unsigned-32]
     [graphics_exposures unsigned-32]
-    [ClipOriginX unsigned-32]
     [clip_x_origin integer-32]
-    [ClipOriginY unsigned-32]
     [clip_y_origin integer-32]
-    [ClipMask unsigned-32]
     [clip_mask unsigned-32]
-    [DashOffset unsigned-32]
     [dash_offset unsigned-32]
-    [DashList unsigned-32]
     [dashes unsigned-32]
-    [ArcMode unsigned-32]
     [arc_mode-enum unsigned-32]))
+
 (define-ftype font-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype gcontext-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype match-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype pixmap-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype value-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype alloc-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define copygc-opcode 57)
 (define-ftype copygc
   (struct
@@ -2000,15 +1673,12 @@
   (struct
     [pad0 (array 1 unsigned-8)]
     [gc unsigned-32]))
+
 (define-ftype gcontext-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define cleararea-opcode 61)
 (define-ftype cleararea
   (struct
@@ -2031,33 +1701,24 @@
     [dst_y integer-16]
     [width unsigned-16]
     [height unsigned-16]))
+
 (define-ftype drawable-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype gcontext-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype match-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define copyplane-opcode 63)
 (define-ftype copyplane
   (struct
@@ -2089,42 +1750,30 @@
     [drawable unsigned-32]
     [gc unsigned-32]
     [points point]))
+
 (define-ftype drawable-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype gcontext-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype match-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype value-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define-ftype segment
   (struct
     [x1 integer-16]
@@ -2138,33 +1787,24 @@
     [drawable unsigned-32]
     [gc unsigned-32]
     [segments segment]))
+
 (define-ftype drawable-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype gcontext-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype match-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define polyrectangle-opcode 67)
 (define-ftype polyrectangle
   (struct
@@ -2200,33 +1840,24 @@
     [drawable unsigned-32]
     [gc unsigned-32]
     [rectangles rectangle]))
+
 (define-ftype drawable-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype gcontext-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype match-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define polyfillarc-opcode 71)
 (define-ftype polyfillarc
   (struct
@@ -2295,33 +1926,24 @@
     [x integer-16]
     [y integer-16]
     [string (* unsigned-8)]))
+
 (define-ftype drawable-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype gcontext-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype match-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define imagetext16-opcode 77)
 (define-ftype imagetext16
   (struct
@@ -2331,33 +1953,24 @@
     [x integer-16]
     [y integer-16]
     [string (* char2b)]))
+
 (define-ftype drawable-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype gcontext-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype match-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 
 (define colormapalloc (enum '((colormapalloc-none 0)
     (colormapalloc-all 1))))
@@ -2417,15 +2030,12 @@
     [blue unsigned-16]
     [pad1 (array 2 unsigned-8)]
     [pixel unsigned-32]))
+
 (define-ftype colormap-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define allocnamedcolor-opcode 85)
 (define-ftype allocnamedcolor
   (struct
@@ -2581,47 +2191,35 @@
     [back_red unsigned-16]
     [back_green unsigned-16]
     [back_blue unsigned-16]))
+
 (define-ftype alloc-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype font-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
+
 (define-ftype value-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define freecursor-opcode 95)
 (define-ftype freecursor
   (struct
     [pad0 (array 1 unsigned-8)]
     [cursor unsigned-32]))
+
 (define-ftype cursor-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define recolorcursor-opcode 96)
 (define-ftype recolorcursor
   (struct
@@ -2712,19 +2310,12 @@
   (struct
     [KeyClickPercent unsigned-32]
     [key_click_percent integer-32]
-    [BellPercent unsigned-32]
     [bell_percent integer-32]
-    [BellPitch unsigned-32]
     [bell_pitch integer-32]
-    [BellDuration unsigned-32]
     [bell_duration integer-32]
-    [Led unsigned-32]
     [led unsigned-32]
-    [LedMode unsigned-32]
     [led_mode-enum unsigned-32]
-    [Key unsigned-32]
     [key unsigned-32]
-    [AutoRepeatMode unsigned-32]
     [auto_repeat_mode-enum unsigned-32]))
 (define-ftype getkeyboardcontrol-reply
   (struct
@@ -2832,15 +2423,12 @@
   (struct
     [pad0 (array 1 unsigned-8)]
     [resource unsigned-32]))
+
 (define-ftype value-error
   (struct
-  [response-type unsigned-8]
-    [error-code unsigned-8]
-    [sequence unsigned-16]
-    [bad-value unsigned-32]
-    [minor-opcode unsigned-16]
-    [major-opcode unsigned-8]
-    [pad0 unsigned-8]))
+   [response-type unsigned-8]
+   [error-code unsigned-8]
+   [sequence unsigned-16]))
 (define rotateproperties-opcode 114)
 (define-ftype rotateproperties
   (struct

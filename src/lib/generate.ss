@@ -22,50 +22,23 @@
     (cond
      [(or (null? l) (null? (cdr l))) #t]
      [(member (caadr l) skip-tagl)
-      (let loop [(lc (cdr l))]
+      (let loop [(lc l)]
 	(cond
-	 [(null? lc) lc]
-	 [(member (caar lc) struct-tagl) lc]
-	 [else (loop (cdr lc))]))]))
+	 [(null? (cdr lc)) lc]
+	 [(member (caadr lc) struct-tagl) lc]
+	 [else (loop (cdr lc))]))]
+     [else l]))
   
 
   ;;DOC: TODO
   ;; RETURNS A BOOLEAN
   ;; #t -> newline must be inserted
   ;; #f -> no newline
-  ;;  (define l '()) ;; just to be sure this compiles correctly
-  ;; (define (maybe-insert-newline lc tagl useless-tagl1 useless-tagl2 field-tagl)
-  ;;   (printf "in insert, next 3 elements of l: ~a\n" (take 3 lc))
-  ;;   (let loop [(lc lc)]
-  ;;     (cond
-  ;;      [(null? lc)
-  ;; 	(set! l lc) ;;l is an external variable
-  ;; 	#t]
-  ;;      [(null? (cdr lc))
-  ;; 	(set! l (cdr lc))
-  ;; 	#t]
-  ;;      [(member (caadr lc) useless-tagl1)
-  ;; 	(loop (cdr lc))]
-  ;;      [(member (caadr lc) useless-tagl2)
-  ;; 	(let inner [(lcc (cdr lc))]
-  ;; 	  (cond
-  ;; 	   [(null? lcc)
-  ;; 	    (set! l lcc)
-  ;; 	    #t]
-  ;; 	   [(member (caar lcc) tagl)
-  ;; 	    (set! l lcc)
-  ;; 	    #t]
-  ;; 	   [else
-  ;; 	    (inner (cdr lcc))]))]
-  ;;      [(member (caadr lc) tagl) #t]
-  ;;      [(member (caadr lc) field-tagl) #f]
-  ;;      [else (loop (cdr lc))])))
-
   (define (maybe-insert-newline lc struct-tagl doc-tagl field-tagl)
     (let loop [(lc lc)]
      (cond
       [(null? lc) (cons #t (cons '() '()))]
-      [(null? (cdr lc)) (cons #t (cons '() '()))]
+      [(null? (cdr lc)) (cons #t (cons lc '()))]
       [(member (caadr lc) struct-tagl) (cons #t (cons lc '()))]
       [(member (caadr lc) doc-tagl)
        (let inner [(lcc lc)]
@@ -114,12 +87,14 @@
      [(null? current-node) #t]
      [(pair? current-node)
       (printf "current node: ~a\n" current-node)
-      (printf "next 3 elements: ~a\n" (take 3 l))
+      (printf "next 4 elements: ~a\n" (take 4 l))
       (cond
        [needs-reply? ;;reply to a request struct
 	(put-string port (format "(define-ftype ~s-reply\n  (struct\n    "
 				 (string->symbol (safestring request-name))))
-	(list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) "" #f 0 list-stack)]
+	(list->code-aux port (if (not (null? l)) (cdr l) '())
+			(if (null? (cdr l)) '() (cadr l))
+			"" #f 0 list-stack)]
        [(member (car current-node) (add 'switch data-structures))
 	(put-string
 	 port
@@ -138,14 +113,23 @@
 	     [else dast]))))
 	(set! custom-types (cons (string->symbol (safestring (cadr (assoc 'name (cdr current-node)))))
 				 custom-types))
-	(list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) "" #f 0 list-stack)]
+	(list->code-aux port (if (not (null? l)) (cdr l) '())
+			(if (null? (cdr l)) '() (cadr l))
+			"" #f 0 list-stack)]
+       [(equal? (car current-node) 'import)
+	(put-string port (format "(load \"~a.ss\")"
+				 (cadr current-node)))
+	(list->code-aux port (cdr l) (cadr l) "" #f 0 list-stack)]
        [(equal? (car current-node) 'request)
 	(cond
 	 [(member (caadr l) '(bitcase see example doc description list op brief fieldref))
 	  ;;truncate the next node in the list and append the current one instead
 	  (list->code-aux port (cons current-node (cddr l)) (current-node) "" #f 0 list-stack)]
 	 [(equal? (caadr l) 'reply)
-	  (list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) (cadr (assoc 'name (cdr current-node))) #t 0 list-stack)]
+	  (list->code-aux port (if (not (null? l)) (cdr l) '())
+			  (if (null? (cdr l)) '() (cadr l))
+			  (cadr (assoc 'name (cdr current-node)))
+			  #t 0 list-stack)]
 	 [else
 	  (let [(opcode (assoc 'opcode (cdr current-node)))
 		(reqname (assoc 'name (cdr current-node)))]
@@ -161,7 +145,9 @@
 					 (string->symbol (safestring (cadr reqname)))))
 		(put-string port (format "(define-ftype ~s\n  (struct\n    "
 					 (string->symbol (safestring (cadr reqname))))))
-	    (list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) (cadr reqname) #f 0 list-stack))])]
+	    (list->code-aux port (if (not (null? l)) (cdr l) '())
+			    (if (null? (cdr l)) '() (cadr l))
+			    (cadr reqname) #f 0 list-stack))])]
        [(equal? (car current-node) 'reply)
 	(list->code-aux port l (car l) request-name #t 0 list-stack)]
        [(equal? (car current-node) 'type)
@@ -176,7 +162,9 @@
 				 (if (not (assoc 'type (list (cadr l))))
 				     "))\n"
 				     "\n    ")))
-	(list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) request-name needs-reply? npad list-stack)]
+	(list->code-aux port (if (not (null? l)) (cdr l) '())
+			(if (null? (cdr l)) '() (cadr l))
+			request-name needs-reply? npad list-stack)]
        [(equal? (car current-node) 'event)
 	(put-string port (format "(define ~s-number ~s)\n"
 				 (string->symbol
@@ -192,7 +180,9 @@
 				  (safestring
 				   (cadr
 				    (assoc 'name (cdr current-node)))))))
-	(list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) request-name needs-reply? npad list-stack)]
+	(list->code-aux port (if (not (null? l)) (cdr l) '())
+			(if (null? (cdr l)) '() (cadr l))
+			request-name needs-reply? npad list-stack)]
        [(equal? (car current-node) 'typedef)
 	;;<typedef oldname="oldtype" newname="newtype"> ->
 	;;(typedef (oldname "oldtype") (newname "newtype"))
@@ -211,7 +201,8 @@
 	    (set! int32s (cons nt int32s))]
 	   [(member ot int8s)
 	    (set! int8s (cons nt int8s))]))
-	(list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) "" #f 0 list-stack)]
+	(list->code-aux port (if (not (null? l)) (cdr l) '())
+			(if (null? (cdr l)) '() (cadr l)) "" #f 0 list-stack)]
        [(equal? (car current-node) 'enum)
 	(let [(enum-name (safestring (cadr (assoc 'name (cdr current-node)))))]
           (put-string port
@@ -265,7 +256,9 @@
               (loop enuml (cdr lc) (+ 1 idx))])))]
        [(member (car current-node) '(field exprfield))
 	(if (< (length (cdr current-node)) 2)
-	    (list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) request-name needs-reply? npad list-stack)
+	    (list->code-aux port (if (not (null? l)) (cdr l) '())
+			    (if (null? (cdr l)) '() (cadr l))
+			    request-name needs-reply? npad list-stack)
 	    (begin
 	      (put-string
 	       port
@@ -314,7 +307,9 @@
 					  (car maybel)))
 		    "))\n"
 		    "\n    ")))
-	      (list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) request-name needs-reply? npad list-stack)))]
+	      (list->code-aux port (if (not (null? l)) (cdr l) '())
+			      (if (or (null? l) (null? (cdr l))) '() (cadr l))
+			      request-name needs-reply? npad list-stack)))]
        [(equal? (car current-node) 'enumref)
 	(put-string port (format "[~s ~s]~a"
 				 (string->symbol (caddr current-node))
@@ -329,7 +324,9 @@
 					   (car maybel)))
 				     "))\n"
 				     "\n    ")))
-	(list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) request-name needs-reply? npad list-stack)]
+	(list->code-aux port (if (not (null? l)) (cdr l) '())
+		        (if (or (null? l) (null? (cdr l))) '() (cadr l))
+			request-name needs-reply? npad list-stack)]
        [(equal? (car current-node) 'pad)
 	(put-string port (format "[pad~s (array ~a unsigned-8)]~a"
 				 npad
@@ -341,33 +338,44 @@
 							'(description see example brief doc)
 							field-xml-tags))]
 					   (set! l (cadr maybel))
+					   (printf "~a\n" maybel)
 					   (car maybel)))
 				     "))\n"
 				     "\n    ")))
-	(list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) request-name needs-reply? (add1 npad) list-stack)]
+	(list->code-aux port (if (not (null? l)) (cdr l) '())
+			(if (or (null? l) (null? (cdr l))) '() (cadr l)) request-name
+			needs-reply? (add1 npad) list-stack)]
        [(equal? (car current-node) 'error)
-	(let [(errt (assoc 'type (cdr current-node)))]
-	  (put-string port (format "(define-ftype ~s-error\n  (struct\n  ~a))\n"
-				   (string->symbol (safestring (cadr errt)))
-			           (string-append "[response-type unsigned-8]\n    "
-						  "[error-code unsigned-8]\n    "
-						  "[sequence unsigned-16]\n    "
-						  "[bad-value unsigned-32]\n    "
-						  "[minor-opcode unsigned-16]\n    "
-						  "[major-opcode unsigned-8]\n    "
-						  "[pad0 unsigned-8]")
-				   ))
-	  (list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) request-name needs-reply? npad list-stack))]
+	(let [(errt (assoc 'type (cdr current-node)))
+	      (errn (assoc 'name (cdr current-node)))
+	      (number (assoc 'number (cdr current-node)))]
+	  (put-string port (format "~a(define-ftype ~s-error\n  (struct\n   ~a~a"
+				   (if number
+				       (format "(define ~s-error-number ~a)\n"
+					       (string->symbol (safestring
+								(if errt (cadr errt) (cadr errn))))
+					       (string->number (safestring (cadr number))))
+				       "\n")
+				   (string->symbol (safestring (if errt (cadr errt) (cadr errn))))
+			           (string-append "[response-type unsigned-8]\n   "
+						  "[error-code unsigned-8]\n   "
+						  "[sequence unsigned-16]")
+				   (if (or (null? (cdr l))
+					   (let [(maybel (maybe-insert-newline
+							  l
+							  struct-xml-tags
+							  '(description see example brief doc)
+							  field-xml-tags))]
+					     (set! l (cadr maybel))
+					     (car maybel)))
+				       "))\n"
+				       "\n   ")))
+	  (list->code-aux port (if (not (null? l)) (cdr l) '())
+			  (if (or (null? l) (null? (cdr l))) '() (cadr l)) request-name
+			  needs-reply? npad list-stack))]
        [(equal? (car current-node) 'list)
 	;;this is tricky, it may or may not be useful,
 	;;but we'll keep it anyway just in case.
-	;;sometimes a list is declared first, and assigned a size later.
-	;;in the XML logic this is permitted, but we're in Scheme, so we need to act
-	;;accordingly and put everything together at the same time. The most trivial working
-	;;way to do so is to make a stack of list names and when we later find a 'value' field
-	;;matching the top of the stack, we remove it from the stack and codegen the list there.
-	;;this works UNDER THE ASSUMPTION THAT list names are in fact assigned a size in a
-	;;stack-ish way, so if a gets declared before b, then b is assigned first, and then a.
 	(cond
 	 [(or
 	   (null? (cdr l))
@@ -403,8 +411,8 @@
 				       "\n    ")))
 	  (list->code-aux
 	   port
-	   (cdr l)
-	   (if (null? (cdr l)) '() (cadr l))
+	   (if (not (null? l)) (cdr l) '())
+	   (if (or (null? l) (null? (cdr l))) '() (cadr l))
 	   request-name
 	   needs-reply?
 	   npad
@@ -442,8 +450,8 @@
 				       "\n    ")))
 	  (list->code-aux
 	   port
-	   (cddr l)
-	   (if (null? (cddr l)) '() (caddr l))
+	   (if (not (null? l)) (cdr l) '())
+	   (if (or (null? l) (null? (cdr l))) '() (cadr l))
 	   request-name
 	   needs-reply?
 	   npad
@@ -511,7 +519,9 @@
 						 (car maybel)))
 					   "))\n"
 					   "\n    "))))
-	  (list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) request-name needs-reply? npad list-stack)]
+	  (list->code-aux port (if (not (null? l)) (cdr l) '())
+			  (if (or (null? l) (null? (cdr l))) '() (cadr l))
+			  request-name needs-reply? npad list-stack)]
 	 [else
           (put-string port (format "[~a ~a]~a"
 				   (string->symbol
@@ -542,7 +552,9 @@
 					     (car maybel)))
 				       "))\n"
 				       "\n    ")))
-	  (list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) request-name needs-reply? npad list-stack)])]
+	  (list->code-aux port (if (not (null? l)) (cdr l) '())
+			  (if (or (null? l) (null? (cdr l))) '() (cadr l))
+			  request-name needs-reply? npad list-stack)])]
        [(equal? (car current-node) 'value)
 	(list->code-aux port (cdr l) (if (null? (cdr l)) '() (cadr l)) request-name needs-reply? npad list-stack)]
        [(member (car current-node)
@@ -551,9 +563,12 @@
 	;; anything, just so we can skip to the next structure.
 	(printf "found a doc! next 3 elements: ~a\n" (take 3 l))
 	(let [(skp (skip-docs l struct-xml-tags '(description see example brief doc)))]
-	    (list->code-aux port skp
-			    (if (or (null? skp) (null? (cdr skp))) '() (cadr skp))
-			    request-name needs-reply? npad list-stack))]
+	  (list->code-aux port skp
+			  (if (or (null? skp) (null? (cdr skp))) '() (cadr skp))
+			  request-name needs-reply? npad list-stack))]
+       [(member (car current-node) '(fieldref bitcase op))
+	(list->code-aux port (cdr l)
+			(if (null? (cdr l)) '() (cadr l)) request-name needs-reply? npad list-stack)]
        [(equal? (car current-node) 'xidtype)
 	(put-string port (format "(define-ftype ~s unsigned-32)\n"
 				 (string->symbol

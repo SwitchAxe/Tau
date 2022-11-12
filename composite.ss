@@ -1,4 +1,4 @@
-(load "enum.ss")
+(import (enums))
 
 (define redirect (enum '((redirect-automatic 0)
     (redirect-manual 1))))
@@ -13,23 +13,33 @@
     [major_version unsigned-32]
     [minor_version unsigned-32]
     [pad1 (array 16 unsigned-8)]))
-[window unsigned-32]
+(define redirectwindow-opcode 1)
+(define-ftype redirectwindow
+  (struct
     [window unsigned-32]
     [update-enum unsigned-8]
-    [pad2 (array 3 unsigned-8)]))
-[window unsigned-32]
+    [pad0 (array 3 unsigned-8)]))
+(define redirectsubwindows-opcode 2)
+(define-ftype redirectsubwindows
+  (struct
     [window unsigned-32]
     [update-enum unsigned-8]
-    [pad3 (array 3 unsigned-8)]))
-[window unsigned-32]
+    [pad0 (array 3 unsigned-8)]))
+(define unredirectwindow-opcode 3)
+(define-ftype unredirectwindow
+  (struct
     [window unsigned-32]
     [update-enum unsigned-8]
-    [pad4 (array 3 unsigned-8)]))
-[window unsigned-32]
+    [pad0 (array 3 unsigned-8)]))
+(define unredirectsubwindows-opcode 4)
+(define-ftype unredirectsubwindows
+  (struct
     [window unsigned-32]
     [update-enum unsigned-8]
-    [pad5 (array 3 unsigned-8)]))
-[region region]
+    [pad0 (array 3 unsigned-8)]))
+(define createregionfromborderclip-opcode 5)
+(define-ftype createregionfromborderclip
+  (struct
     [region region]
     [window unsigned-32]))
 (define namewindowpixmap-opcode 6)

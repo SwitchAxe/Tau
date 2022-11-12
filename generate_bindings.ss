@@ -1,10 +1,7 @@
 (import (generate)
 	(parse))
 
-(display (directory-list "src/xml/"))
-(newline)
-(define xml (prepare-xml "src/xml/composite.xml"))
-(display "ciao!!!\n")
+(define xml (prepare-xml "src/xml/render.xml"))
 (display xml)
 (newline)
 
@@ -14,10 +11,13 @@
    (define l (sv-xml->list xml))
    (define p (prepare-port
 	      (string-append
+	       "src/xcb/"
 	       (string-truncate!
 		f
 		(- (string-length f) 4))
 	       ".ss")))
+   (pretty-print l)
    (list->code l p)
    (close-port p))
- '("xproto.xml" "composite.xml"))
+ (directory-list "src/xml"))
+(exit)
