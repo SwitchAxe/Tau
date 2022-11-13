@@ -68,10 +68,8 @@ PERFORMANCE OF THIS SOFTWARE.
 -->
 <!-- This file describes version 0.3 of COMPOSITE. -->
 <xcb header="composite" extension-xname="Composite" extension-name="Composite" major-version="0" minor-version="4">
-<!--
   <import>xproto</import>
   <import>xfixes</import>
--->
 
   <enum name="Redirect">
     <item name="Automatic"> <value>0</value> </item>
