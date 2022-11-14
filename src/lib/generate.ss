@@ -102,11 +102,11 @@
 					 [else (car basic-type-list)])
 					port)])]
 	  [else
-	   (put-string port (format "(define-ftype ~a-iterator (struct\n  ~a"
+	   (put-string port (format "(define-ftype ~a-iterator\n  (struct\n    ~a"
 				    (car struct-list)
-				    (string-append (format "[data (* ~a)]\n"
+				    (string-append (format "[data (* ~a)]\n    "
 							   (car struct-list))
-						   "[rem int]\n  "
+						   "[rem int]\n    "
 						   "[index int]))\n")))
 	   (make-iterators (cdr struct-list) basic-type-list port)]))
 

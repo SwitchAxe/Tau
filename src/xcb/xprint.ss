@@ -235,46 +235,56 @@
    [response-type unsigned-8]
    [error-code unsigned-8]
    [sequence unsigned-16]))
-(define-ftype printer-iterator (struct
-  [data (* printer)]
-[rem int]
-  [index int]))
-(define-ftype listitem-iterator (struct
-  [data (* listitem)]
-[rem int]
-  [index int]))
-(define-ftype imageformatinfo-iterator (struct
-  [data (* imageformatinfo)]
-[rem int]
-  [index int]))
-(define-ftype attributeinfo-iterator (struct
-  [data (* attributeinfo)]
-[rem int]
-  [index int]))
-(define-ftype image-iterator (struct
-  [data (* image)]
-[rem int]
-  [index int]))
-(define-ftype encodinginfo-iterator (struct
-  [data (* encodinginfo)]
-[rem int]
-  [index int]))
-(define-ftype adaptorinfo-iterator (struct
-  [data (* adaptorinfo)]
-[rem int]
-  [index int]))
-(define-ftype format-iterator (struct
-  [data (* format)]
-[rem int]
-  [index int]))
-(define-ftype rational-iterator (struct
-  [data (* rational)]
-[rem int]
-  [index int]))
-(define-ftype surfaceinfo-iterator (struct
-  [data (* surfaceinfo)]
-[rem int]
-  [index int]))
+(define-ftype printer-iterator
+  (struct
+    [data (* printer)]
+    [rem int]
+    [index int]))
+(define-ftype listitem-iterator
+  (struct
+    [data (* listitem)]
+    [rem int]
+    [index int]))
+(define-ftype imageformatinfo-iterator
+  (struct
+    [data (* imageformatinfo)]
+    [rem int]
+    [index int]))
+(define-ftype attributeinfo-iterator
+  (struct
+    [data (* attributeinfo)]
+    [rem int]
+    [index int]))
+(define-ftype image-iterator
+  (struct
+    [data (* image)]
+    [rem int]
+    [index int]))
+(define-ftype encodinginfo-iterator
+  (struct
+    [data (* encodinginfo)]
+    [rem int]
+    [index int]))
+(define-ftype adaptorinfo-iterator
+  (struct
+    [data (* adaptorinfo)]
+    [rem int]
+    [index int]))
+(define-ftype format-iterator
+  (struct
+    [data (* format)]
+    [rem int]
+    [index int]))
+(define-ftype rational-iterator
+  (struct
+    [data (* rational)]
+    [rem int]
+    [index int]))
+(define-ftype surfaceinfo-iterator
+  (struct
+    [data (* surfaceinfo)]
+    [rem int]
+    [index int]))
 (define-ftype string8-iterator
   (struct
     [data (* unsigned-8)]

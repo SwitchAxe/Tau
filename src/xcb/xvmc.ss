@@ -96,10 +96,11 @@
     [num unsigned-32]
     [pad1 (array 20 unsigned-8)]
     [types (* imageformatinfo)]))
-(define-ftype surfaceinfo-iterator (struct
-  [data (* surfaceinfo)]
-[rem int]
-  [index int]))
+(define-ftype surfaceinfo-iterator
+  (struct
+    [data (* surfaceinfo)]
+    [rem int]
+    [index int]))
 (define-ftype byte-iterator
   (struct
     [data (* unsigned-8)]
