@@ -80,14 +80,57 @@
   (define (safestring s)
     (strlit->string (string-downcase s)))
 
+
+  (define (iterator-format n t port)
+    (put-string port (format "(define-ftype ~a-iterator\n  (struct\n    ~a"
+			     n
+			     (string-append (format "[data (* ~a)]\n    " t)
+					    "[rem int]\n    "
+					    "[index int]))\n"))))
+  
+  (define (make-iterators struct-list basic-type-list port)
+    (cond [(null? struct-list)
+	   (cond [(null? basic-type-list) #t]
+		 [else (iterator-format (car basic-type-list)
+					(cond
+					 [(member (car basic-type-list) uint8s) "unsigned-8"]
+					 [(member (car basic-type-list) uint16s) "unsigned-16"]
+					 [(member (car basic-type-list) uint32s) "unsigned-32"]
+					 [(member (car basic-type-list) int8s) "integer-8"]
+					 [(member (car basic-type-list) int16s) "integer-16"]
+					 [(member (car basic-type-list) int32s) "integer-32"]
+					 [else (car basic-type-list)])
+					port)])]
+	  [else
+	   (put-string port (format "(define-ftype ~a-iterator (struct\n  ~a"
+				    (car struct-list)
+				    (string-append (format "[data (* ~a)]\n"
+							   (car struct-list))
+						   "[rem int]\n  "
+						   "[index int]))\n")))
+	   (make-iterators (cdr struct-list) basic-type-list port)]))
+
+
+  
   (define (list->code-aux port l current-node request-name needs-reply? npad list-stack)
     (cond
      ;;the code generation was successful.
-     [(null? l) #t]
-     [(null? current-node) #t]
+     [(null? l)
+      (make-iterators (filter
+		       (lambda (e) (not (equal? e 'switch)))
+		       custom-types)
+		      (append uint8s uint16s uint32s
+					   int8s int16s int32s)
+		      port)]
+     [(null? current-node)
+      (make-iterators (filter
+		       (lambda (e) (not (equal? e 'switch)))
+		       custom-types)
+		      (append uint8s uint16s uint32s
+			      int8s int16s int32s)
+		      port)]
      [(pair? current-node)
       (printf "current node: ~a\n" current-node)
-      (printf "next 4 elements: ~a\n" (take 4 l))
       (cond
        [needs-reply? ;;reply to a request struct
 	(put-string port (format "(define-ftype ~s-reply\n  (struct\n    "
@@ -346,7 +389,6 @@
 							'(description see example brief doc)
 							field-xml-tags))]
 					   (set! l (cadr maybel))
-					   (printf "~a\n" maybel)
 					   (car maybel)))
 				     "))\n"
 				     "\n    ")))
@@ -569,7 +611,6 @@
 		'(doc brief description see example)) ;;just skip it
 	;; use the insert newline function, even though we don't need to print
 	;; anything, just so we can skip to the next structure.
-	(printf "found a doc! next 3 elements: ~a\n" (take 3 l))
 	(let [(skp (skip-docs l struct-xml-tags '(description see example brief doc)))]
 	  (list->code-aux port skp
 			  (if (or (null? skp) (null? (cdr skp))) '() (cadr skp))
