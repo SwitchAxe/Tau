@@ -2772,3 +2772,6 @@
     [keycodes_per_modifier unsigned-8]
     [pad0 (array 24 unsigned-8)]
     [keycodes (array 8 unsigned-8)]))
+
+;; -------------- XPROTO: FUNCTION DEFINITIONS-------------------
+

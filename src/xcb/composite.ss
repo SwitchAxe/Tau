@@ -1,5 +1,5 @@
 (import (enums))
-(define redirect (enum
+(load "xproto.ss")(load "xfixes.ss")(define redirect (enum
   '((redirect-automatic 0)
   (redirect-manual 0))))
 (define queryversion-opcode 0)

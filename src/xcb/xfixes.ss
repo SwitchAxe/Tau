@@ -1,5 +1,5 @@
 (import (enums))
-(define queryversion-opcode 0)
+(load "xproto.ss")(load "render.ss")(load "shape.ss")(define queryversion-opcode 0)
 (define-ftype queryversion
   (struct
     [client_major_version unsigned-32]

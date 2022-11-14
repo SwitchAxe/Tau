@@ -122,9 +122,9 @@
 	(list->code-aux port (cdr l) (cadr l) "" #f 0 list-stack)]
        [(equal? (car current-node) 'request)
 	(cond
-	 [(member (caadr l) '(bitcase see example doc description list op brief fieldref))
+	 [(member (caadr l) '(bitcase see example doc description op brief fieldref))
 	  ;;truncate the next node in the list and append the current one instead
-	  (list->code-aux port (cons current-node (cddr l)) (current-node) "" #f 0 list-stack)]
+	  (list->code-aux port (cons current-node (cddr l)) current-node "" #f 0 list-stack)]
 	 [(equal? (caadr l) 'reply)
 	  (list->code-aux port (if (not (null? l)) (cdr l) '())
 			  (if (null? (cdr l)) '() (cadr l))
@@ -268,21 +268,30 @@
 		  (string->symbol
 		   (string-append
 		    (safestring
-		     (cadr
-		      (assoc 'name (cdr current-node))))
+		     (let [(name (assoc 'name (cdr current-node)))]
+		       (if (= (length name) 2)
+			   (cadr
+			    (assoc 'name (cdr current-node)))
+			   (caaddr (cdr current-node)))))
 		    "-enum"))]
 		 [(assoc 'mask (cdr current-node))
 		  (string->symbol
 		   (string-append
 		    (safestring
-		     (cadr
-		      (assoc 'name (cdr current-node))))
+		     (let [(name (assoc 'name (cdr current-node)))]
+		       (if (= (length name) 2)
+			   (cadr
+			    (assoc 'name (cdr current-node)))
+			   (caaddr (cdr current-node)))))
 		    "-mask"))]
 		 [else
 		  (string->symbol
 		   (safestring
-		    (cadr
-		     (assoc 'name (cdr current-node)))))])
+		    (let [(name (assoc 'name (cdr current-node)))]
+		      (if (= (length name) 2)
+			  (cadr
+			   (assoc 'name (cdr current-node)))
+			  (caaddr (cdr current-node))))))])
 		(cond
 		 [else
 		  (string->symbol
